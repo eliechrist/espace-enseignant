@@ -35,9 +35,24 @@ a.dl{color:var(--p);font-weight:600}
 .hid{display:none}
 body.locked nav,body.locked #f,body.locked #c,body.locked #d,body.locked #m,body.locked #p{display:none!important}
 body:not(.locked) #g{display:none}
+
+header{background:linear-gradient(135deg,var(--p),#1d4f37);text-align:center;padding:10px 16px 16px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+body.adm header{background:linear-gradient(135deg,#243b6b,#162a4f)}
+header .cr{display:block;text-align:center;font-weight:800;font-size:13px;letter-spacing:.3px;margin:0 auto 10px;padding:6px 10px;background:rgba(255,255,255,.18);border-radius:999px}
+header h1{font-size:22px;letter-spacing:.3px;text-align:center}
+.gabon{height:5px;background:linear-gradient(90deg,#009e60 0 33.3%,#fcd116 33.3% 66.6%,#3a75c4 66.6%)}
+nav{padding:12px;gap:8px}
+nav button{flex:1 0 auto;border-radius:999px;font-weight:600;font-size:13px;padding:9px 14px}
+nav button.on{box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.card{border-radius:16px;padding:16px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.card>b:first-child{display:block;font-size:16px;margin-bottom:6px}
+button{border-radius:12px;font-weight:600;padding:10px 14px;transition:transform .08s}
+button:active{transform:scale(.97)}
+input,select,textarea{border-radius:10px}
 </style></head><body class="locked">
-<header><h1>Espace Enseignant</h1><small id="who">Chargement…</small></header>
-<nav><button data-t="a" class="hid">⚙ Admin</button><button data-t="f" class="on">Fiches pédagogiques</button><button data-t="c">Gestion de classe</button><button data-t="d">Documents obligatoires</button><button data-t="p" class="hid">📷 Ma fiche</button><button data-t="m" class="hid">✉ Messages</button></nav>
+<header><div class="cr">Créé par Élie Christ MBERAGANA 066.14.25.42</div><h1>📚 Espace Enseignant</h1><small id="who">Chargement…</small></header>
+<div class="gabon"></div>
+<nav><button data-t="a" class="hid">⚙ Admin</button><button data-t="f" class="on">Fiches pédagogiques</button><button data-t="c">Gestion de classe</button><button data-t="d">Documents obligatoires</button><button data-t="p" class="hid">📷 Fiche par photo</button><button data-t="m" class="hid">✉ Messages</button></nav>
 <main>
 <section id="g"></section>
 <section id="a" class="hid"></section>
@@ -47,6 +62,7 @@ body:not(.locked) #g{display:none}
 <section id="p" class="hid"></section>
 <section id="m" class="hid"></section>
 </main>
+<p id="ver" style="text-align:center;color:var(--m);font-size:12px;margin:0 0 28px"></p>
 <script>
 const $=s=>document.querySelector(s);
 function h(t,a={},...k){const e=document.createElement(t);for(const[x,v]of Object.entries(a)){if(x.startsWith("on"))e.addEventListener(x.slice(2),v);else if(x==="class")e.className=v;else e[x]=v}for(const c of k.flat())e.append(c);return e}
@@ -90,7 +106,7 @@ const DEF=()=>[
 let F={comp:COMPS[0],num:"",palier:"1",cb:"1",section:"4 ans",date:"",duree:"20 min",savoir:"",sf:"",se:"",mode:"Atelier",obj:"",mat:"",rows:DEF()};
 function field(lab,k,type){const i=type==="ta"?h("textarea"):h("input");i.value=F[k]||"";i.oninput=()=>F[k]=i.value;return h("div",{},h("label",{},lab),i)}
 function renderF(){
- const r=$("#f");r.replaceChildren();
+ const r=$("#f");r.replaceChildren();r.append(photoShortcut());
  const sel=h("select");COMPS.forEach(c=>sel.append(h("option",{value:c,selected:c===F.comp},c)));sel.onchange=()=>F.comp=sel.value;
  r.append(h("div",{class:"card"},h("label",{},"Composante"),sel,
   h("div",{class:"g"},field("Palier","palier"),field("CB","cb"),field("Section","section"),field("Durée","duree"),field("N° de fiche","num"),field("Date","date")),
@@ -261,7 +277,7 @@ function ensPdf(m,cur,gen){try{const d=new window.jspdf.jsPDF({unit:"mm",format:
  savePdf(d,"Rapport_ensemble_"+m+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
 /* ---------- FIREBASE : SUIVI EN TEMPS RÉEL ET MESSAGES ---------- */
 const FB={key:"",db:"",admin:"admin@espace-enseignant.app"};
-async function loadCfg(){try{const t=await(await fetch("config.txt",{cache:"no-store"})).text(),k=t.match(/apiKey\s*[:=]\s*["']([^"']+)["']/),d=t.match(/databaseURL\s*[:=]\s*["']([^"']+)["']/);if(k)FB.key=k[1];if(d)FB.db=d[1]}catch(e){}}
+async function loadCfg(){try{const t=await(await fetch("config.txt",{cache:"no-store"})).text(),k=t.match(/apiKey\s*[:=]\s*["']([^"']+)["']/),d=t.match(/databaseURL\s*[:=]\s*["']([^"']+)["']/);if(k)FB.key=k[1];if(d)FB.db=d[1]}catch(e){}const v=$("#ver");if(v)v.textContent="Version 2.2 · Serveur : "+(FBON()?"configuré":"non configuré")}
 const FBON=()=>!!(FB.key&&FB.db&&FB.admin);
 const canon=pw=>{const q=pw.replace(/[\s-]/g,"").toUpperCase();return q.slice(0,4)+"-"+q.slice(4,8)+"-"+q.slice(8)};
 let AUTH=ls.get("fbauth"),MSGS=[],syncT=0,SUPT=0,SUPSEL=null,SUPMT="";
@@ -292,14 +308,14 @@ async function pollInbox(){
  try{const j=await fb("GET","inbox/"+AUTH.uid)||{};MSGS=Object.values(j).sort((a,b)=>b.t-a.t);
   const b=$('[data-t="m"]');if(!$("#m").classList.contains("hid"))ls.set("seen",Date.now());
   const nw=MSGS.filter(x=>x.t>(+ls.get("seen")||0)).length;b.textContent="✉ Messages"+(nw?" ("+nw+")":"");renderM()}catch(e){}
- try{const m=await fb("GET","readyMeta/"+AUTH.uid)||{};RDY=Object.entries(m).map(([k,v])=>({k,...v})).sort((a,b)=>b.t-a.t);$('[data-t="p"]').textContent="📷 Ma fiche"+(RDY.length?" ("+RDY.length+")":"");renderRdy()}catch(e){}}
+ try{const m=await fb("GET","readyMeta/"+AUTH.uid)||{};RDY=Object.entries(m).map(([k,v])=>({k,...v})).sort((a,b)=>b.t-a.t);$('[data-t="p"]').textContent="📷 Fiche par photo"+(RDY.length?" ("+RDY.length+")":"");renderRdy()}catch(e){}}
 function renderM(){
  const r=$("#m");r.replaceChildren();const box=h("div",{class:"card"},h("b",{},"Messages de l’administrateur"));
  if(!MSGS.length)box.append(h("p",{class:"m"},"Aucun message pour le moment."));
  MSGS.forEach(x=>box.append(h("div",{class:"it",style:"display:block"},h("span",{class:"m"},new Date(x.t).toLocaleString("fr-FR")),h("div",{},x.txt))));
  r.append(box)}
 function startTeacher(){
- if(!FBON()||admin||window._st)return;window._st=1;
+ if(admin||window._st)return;window._st=1;$('[data-t="p"]').classList.remove("hid");renderP();if(!FBON())return;
  $('[data-t="p"]').classList.remove("hid");renderP();const b=$('[data-t="m"]');b.classList.remove("hid");b.addEventListener("click",()=>{ls.set("seen",Date.now());b.textContent="✉ Messages"});renderM();
  (async()=>{try{if(!AUTH||AUTH.adm)await fbAuth("anon",{})}catch(e){}syncReport();pollInbox();setInterval(pollInbox,8000);setInterval(syncReport,60000)})()}
 function supCard(){
@@ -338,22 +354,35 @@ function renderRdy(){
  const box=$("#rdy");if(!box)return;box.replaceChildren(h("b",{},"Mes fiches prêtes"));
  if(!RDY.length)box.append(h("p",{class:"m"},"Aucune fiche prête pour le moment."));
  RDY.forEach(x=>box.append(h("div",{class:"it"},h("span",{},x.name,h("br"),h("span",{class:"m"},new Date(x.t).toLocaleString("fr-FR"))),h("button",{class:"pri",onclick:()=>dlFile("readyFile/"+AUTH.uid+"/"+x.k,x.name)},"Télécharger"))))}
+async function sendWA(){
+ if(!PH2.length){note("Ajoutez d’abord une photo.");return}
+ try{const nm=(TN||"page").replace(/\W+/g,"_"),files=await Promise.all(PH2.map(async(s,i)=>new File([await(await fetch(s)).blob()],"livret_"+nm+"_"+(i+1)+".jpg",{type:"image/jpeg"})));
+  const text="Bonjour, voici la page du livret pour ma fiche pédagogique ("+(TN||"enseignant")+").";
+  try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files,text});return}}catch(e){if(e&&e.name==="AbortError")return}
+  files.forEach(f=>saveBlob(f,f.name));window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");note("Photos enregistrées : joignez-les dans WhatsApp.")}catch(e){note("Échec : "+((e&&e.message)||e))}}
+function photoShortcut(){
+ if(admin)return document.createDocumentFragment();
+ return h("div",{class:"card"},h("b",{},"📷 Fiche automatique à partir d’une photo"),h("p",{class:"m"},"Photographiez la page du livret : l’administrateur prépare votre fiche en PDF et vous la recevez dans l’application."),h("button",{class:"pri",onclick:()=>{const b=$('[data-t="p"]');b.classList.remove("hid");b.click();scrollTo(0,0)}},"Photographier la page du livret"))}
 function renderP(){
  const r=$("#p");if(r.children.length)return;
- const info=h("p",{class:"m"},"Aucune photo choisie."),msg=h("p",{class:"m"},"");
+ const srv=h("p",{class:"m"},FBON()?"Vérification de la connexion…":"⚠ Le serveur n’est pas encore configuré : utilisez le bouton WhatsApp ci-dessous."),
+  info=h("p",{class:"m"},"Aucune photo choisie."),msg=h("p",{class:"m"},"");
  const mk=(txt,cam)=>{const i=h("input",{type:"file",accept:"image/*"});if(cam)i.setAttribute("capture","environment");
   i.onchange=async()=>{for(const f of i.files){try{PH2.push(await shrink(f))}catch(e){msg.textContent="Photo illisible."}}info.textContent=PH2.length+" photo(s) prête(s).";i.value=""};return h("div",{},h("label",{},txt),i)};
  const sec=h("select",{},...["3 ans","4 ans","5 ans"].map(x=>h("option",{value:x,selected:x==="4 ans"},x))),
   typ=h("select",{},h("option",{value:"auto"},"Automatique"),h("option",{value:"unique"},"Fiche unique"),h("option",{value:"seances"},"Fiche en plusieurs séances")),nt=h("input",{placeholder:"Précision (facultatif) : leçon, séance…"});
- r.append(h("div",{class:"card"},h("b",{},"Demander une fiche pédagogique"),h("p",{class:"m"},"Photographiez la page du livret. L’administrateur prépare la fiche et vous la recevez ici en PDF."),mk("📁 Galerie"),mk("📷 Appareil photo",true),info,
+ const send=async()=>{
+  if(!PH2.length){msg.textContent="Ajoutez au moins une photo.";return}
+  if(!FBON()){msg.textContent="Serveur non configuré : utilisez le bouton WhatsApp.";return}
+  try{msg.textContent="Envoi…";if(!AUTH||AUTH.adm)await fbAuth("anon",{});const id=Date.now().toString(36),t=Date.now();
+   await fb("PUT","req/"+AUTH.uid+"/"+id,{t,name:TN,section:sec.value,type:typ.value,note:nt.value,imgs:PH2});
+   await fb("PUT","queue/"+AUTH.uid+"_"+id,{t,name:TN,uid:AUTH.uid,id,n:PH2.length,section:sec.value,note:nt.value,st:"attente"});
+   PH2=[];info.textContent="Aucune photo choisie.";nt.value="";msg.textContent="Demande envoyée ✓ Votre fiche apparaîtra ci-dessous dès qu’elle est prête."}catch(e){msg.textContent="Échec : "+e.message+" — utilisez le bouton WhatsApp."}};
+ r.append(h("div",{class:"card"},h("b",{},"📷 Fiche par photo"),h("p",{class:"m"},"Photographiez la page du livret. L’administrateur prépare la fiche et vous la recevez ici en PDF."),srv,mk("📁 Galerie"),mk("📷 Appareil photo",true),info,
   h("div",{class:"g"},h("div",{},h("label",{},"Section"),sec),h("div",{},h("label",{},"Type de fiche"),typ)),h("label",{},"Précision"),nt,
-  h("div",{class:"row"},h("button",{class:"pri",onclick:async()=>{
-   if(!PH2.length){msg.textContent="Ajoutez au moins une photo.";return}
-   try{msg.textContent="Envoi…";if(!AUTH||AUTH.adm)await fbAuth("anon",{});const id=Date.now().toString(36),t=Date.now();
-    await fb("PUT","req/"+AUTH.uid+"/"+id,{t,name:TN,section:sec.value,type:typ.value,note:nt.value,imgs:PH2});
-    await fb("PUT","queue/"+AUTH.uid+"_"+id,{t,name:TN,uid:AUTH.uid,id,n:PH2.length,section:sec.value,note:nt.value,st:"attente"});
-    PH2=[];info.textContent="Aucune photo choisie.";nt.value="";msg.textContent="Demande envoyée ✓ Votre fiche apparaîtra ci-dessous dès qu’elle est prête."}catch(e){msg.textContent="Échec : "+e.message}}},"Envoyer la demande")),msg));
- r.append(h("div",{class:"card",id:"rdy"}));renderRdy()}
+  h("div",{class:"row"},h("button",{class:"pri",onclick:send},"Envoyer la demande"),h("button",{onclick:sendWA},"Envoyer par WhatsApp")),msg));
+ r.append(h("div",{class:"card",id:"rdy"}));renderRdy();
+ if(FBON())(async()=>{try{if(!AUTH||AUTH.adm)await fbAuth("anon",{});await fb("GET","readyMeta/"+AUTH.uid);srv.textContent="✅ Connexion au serveur prête."}catch(e){srv.textContent="⚠ Serveur indisponible ("+e.message+") : utilisez le bouton WhatsApp."}})()}
 function reqCard(){
  const box=h("div",{class:"card"},h("b",{},"Demandes de fiches (photos des enseignants)"));
  if(!FBON()){box.append(h("p",{class:"m"},"Non configuré : la base Firebase n’est pas encore reliée."));return box}
@@ -390,7 +419,7 @@ function renderG(err){
 }
 async function boot(){
  const ak=ls.get("adminkey");if(ak&&ak.d)admin=true;
- if(admin){document.body.classList.remove("locked");document.body.classList.add("adm");$("#who").textContent="Administrateur";const t=document.querySelector('[data-t="a"]');t.classList.remove("hid");t.click();renderA();return}
+ if(admin){renderF();document.body.classList.remove("locked");document.body.classList.add("adm");$("#who").textContent="Administrateur";const t=document.querySelector('[data-t="a"]');t.classList.remove("hid");t.click();renderA();return}
  const c=ls.get("acc"),r=c?await verify(c):null;
  if(r&&!r.err){TN=r.n;document.body.classList.remove("locked");startTeacher();$("#who").textContent="Bonjour "+r.n+(r.e?" · accès jusqu’au "+new Date(r.e).toLocaleDateString("fr-FR"):"")}
  else{document.body.classList.add("locked");$("#who").textContent="Accès à activer";renderG(r&&r.err)}
