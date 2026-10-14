@@ -33,17 +33,18 @@ button.del{border-color:var(--r);color:var(--r)}
 .m{color:var(--m);font-size:13px}
 a.dl{color:var(--p);font-weight:600}
 .hid{display:none}
-body.locked nav,body.locked #f,body.locked #c,body.locked #d,body.locked #m{display:none!important}
+body.locked nav,body.locked #f,body.locked #c,body.locked #d,body.locked #m,body.locked #p{display:none!important}
 body:not(.locked) #g{display:none}
 </style></head><body class="locked">
 <header><h1>Espace Enseignant</h1><small id="who">Chargement…</small></header>
-<nav><button data-t="a" class="hid">⚙ Admin</button><button data-t="f" class="on">Fiches pédagogiques</button><button data-t="c">Gestion de classe</button><button data-t="d">Documents obligatoires</button><button data-t="m" class="hid">✉ Messages</button></nav>
+<nav><button data-t="a" class="hid">⚙ Admin</button><button data-t="f" class="on">Fiches pédagogiques</button><button data-t="c">Gestion de classe</button><button data-t="d">Documents obligatoires</button><button data-t="p" class="hid">📷 Ma fiche</button><button data-t="m" class="hid">✉ Messages</button></nav>
 <main>
 <section id="g"></section>
 <section id="a" class="hid"></section>
 <section id="f"></section>
 <section id="c" class="hid"></section>
 <section id="d" class="hid"></section>
+<section id="p" class="hid"></section>
 <section id="m" class="hid"></section>
 </main>
 <script>
@@ -52,7 +53,7 @@ function h(t,a={},...k){const e=document.createElement(t);for(const[x,v]of Objec
 let dl=null,db=null,admin=false,TN="",OBS="",RM="",SELM="";
 const mem={};const ls={get:k=>{try{const v=localStorage.getItem(k);return v==null?(k in mem?mem[k]:null):JSON.parse(v)}catch(e){return k in mem?mem[k]:null}},set:(k,v)=>{mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 function note(m){let n=$("#note");if(!n){n=h("div",{id:"note",style:"position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));background:var(--t);color:var(--bg);padding:12px;border-radius:10px;z-index:9"});document.body.append(n)}n.textContent=m;n.style.display="block";clearTimeout(n._t);n._t=setTimeout(()=>n.style.display="none",6000)}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));["a","f","c","d","m"].forEach(i=>$("#"+i).classList.toggle("hid",i!==b.dataset.t))});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));["a","f","c","d","m","p"].forEach(i=>$("#"+i).classList.toggle("hid",i!==b.dataset.t))});
 const PUB={x:"Xb9EWnPOgTK1uhADGYALhMHzTnNn0REOwuV1e_yNP4s",y:"0-EQaTBG9sMyehFVNGCZZnO2oEO-Og1oeT2FbhmjxdE"},NUM="074.23.88.80",PRIX=2000,REV=[],DOCS=[];
 const ADM={s:"RG6zXsy_BIeFfLJ2_xf0hQ",i:"zNxAmUVfDhy67zq4",c:"WxKn2Wz564nEtT0uBPCw41OXHgmmcD5WBYRMXHkuW0tMoiqmNvrsdebcu1W_H2jTbZcpbmB0BApdbUg"};
 const enc=new TextEncoder(),ECA={name:"ECDSA",namedCurve:"P-256"},SIG={name:"ECDSA",hash:"SHA-256"};
@@ -259,7 +260,8 @@ function ensPdf(m,cur,gen){try{const d=new window.jspdf.jsPDF({unit:"mm",format:
  const g=d.splitTextToSize(gen||"–",180);if(y+g.length*5+10>285){d.addPage();y=20}d.setFont("times","bold");d.text("Observation générale",15,y+4);d.setFont("times","normal");d.text(g,15,y+10);
  savePdf(d,"Rapport_ensemble_"+m+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
 /* ---------- FIREBASE : SUIVI EN TEMPS RÉEL ET MESSAGES ---------- */
-const FB={key:"",db:"",admin:""};
+const FB={key:"",db:"",admin:"admin@espace-enseignant.app"};
+async function loadCfg(){try{const t=await(await fetch("config.txt",{cache:"no-store"})).text(),k=t.match(/apiKey\s*[:=]\s*["']([^"']+)["']/),d=t.match(/databaseURL\s*[:=]\s*["']([^"']+)["']/);if(k)FB.key=k[1];if(d)FB.db=d[1]}catch(e){}}
 const FBON=()=>!!(FB.key&&FB.db&&FB.admin);
 const canon=pw=>{const q=pw.replace(/[\s-]/g,"").toUpperCase();return q.slice(0,4)+"-"+q.slice(4,8)+"-"+q.slice(8)};
 let AUTH=ls.get("fbauth"),MSGS=[],syncT=0,SUPT=0,SUPSEL=null,SUPMT="";
@@ -289,7 +291,8 @@ async function pollInbox(){
  if(!FBON()||admin||!AUTH)return;
  try{const j=await fb("GET","inbox/"+AUTH.uid)||{};MSGS=Object.values(j).sort((a,b)=>b.t-a.t);
   const b=$('[data-t="m"]');if(!$("#m").classList.contains("hid"))ls.set("seen",Date.now());
-  const nw=MSGS.filter(x=>x.t>(+ls.get("seen")||0)).length;b.textContent="✉ Messages"+(nw?" ("+nw+")":"");renderM()}catch(e){}}
+  const nw=MSGS.filter(x=>x.t>(+ls.get("seen")||0)).length;b.textContent="✉ Messages"+(nw?" ("+nw+")":"");renderM()}catch(e){}
+ try{const m=await fb("GET","readyMeta/"+AUTH.uid)||{};RDY=Object.entries(m).map(([k,v])=>({k,...v})).sort((a,b)=>b.t-a.t);$('[data-t="p"]').textContent="📷 Ma fiche"+(RDY.length?" ("+RDY.length+")":"");renderRdy()}catch(e){}}
 function renderM(){
  const r=$("#m");r.replaceChildren();const box=h("div",{class:"card"},h("b",{},"Messages de l’administrateur"));
  if(!MSGS.length)box.append(h("p",{class:"m"},"Aucun message pour le moment."));
@@ -297,7 +300,7 @@ function renderM(){
  r.append(box)}
 function startTeacher(){
  if(!FBON()||admin||window._st)return;window._st=1;
- const b=$('[data-t="m"]');b.classList.remove("hid");b.addEventListener("click",()=>{ls.set("seen",Date.now());b.textContent="✉ Messages"});renderM();
+ $('[data-t="p"]').classList.remove("hid");renderP();const b=$('[data-t="m"]');b.classList.remove("hid");b.addEventListener("click",()=>{ls.set("seen",Date.now());b.textContent="✉ Messages"});renderM();
  (async()=>{try{if(!AUTH||AUTH.adm)await fbAuth("anon",{})}catch(e){}syncReport();pollInbox();setInterval(pollInbox,8000);setInterval(syncReport,60000)})()}
 function supCard(){
  const box=h("div",{class:"card"},h("b",{},"Suivi des enseignants (temps réel)"));
@@ -323,6 +326,57 @@ function supCard(){
   data=await fb("GET","reports")||{};const j=JSON.stringify(data);if(j!==last){last=j;draw()}
   st.textContent="Mis à jour à "+new Date().toLocaleTimeString("fr-FR")+" (toutes les 6 s)"}catch(e){st.textContent="Erreur : "+e.message}};
  load();clearInterval(SUPT);SUPT=setInterval(load,6000);return box}
+
+let RDY=[],PH2=[],SENT=ls.get("sent")||[],RQT=0;
+async function shrink(f){const bm=await createImageBitmap(f),k=Math.min(1,1100/Math.max(bm.width,bm.height)),c=document.createElement("canvas");c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.7)}
+function saveBlob(b,name){const a=h("a",{href:URL.createObjectURL(b),download:name});document.body.append(a);a.click();a.remove()}
+async function dlFile(path,name){try{const j=await fb("GET",path);if(!j||!j.b64)throw Error("fichier introuvable");const bin=atob(j.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);saveBlob(new Blob([u],{type:"application/pdf"}),/\.pdf$/i.test(name)?name:name+".pdf")}catch(e){note("Échec : "+e.message)}}
+async function shareImg(s,name){try{const b=await(await fetch(s)).blob(),f=new File([b],name,{type:"image/jpeg"});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}
+ saveBlob(b,name)}catch(e){if(!e||e.name!=="AbortError")note("Échec : "+((e&&e.message)||e))}}
+function renderRdy(){
+ const box=$("#rdy");if(!box)return;box.replaceChildren(h("b",{},"Mes fiches prêtes"));
+ if(!RDY.length)box.append(h("p",{class:"m"},"Aucune fiche prête pour le moment."));
+ RDY.forEach(x=>box.append(h("div",{class:"it"},h("span",{},x.name,h("br"),h("span",{class:"m"},new Date(x.t).toLocaleString("fr-FR"))),h("button",{class:"pri",onclick:()=>dlFile("readyFile/"+AUTH.uid+"/"+x.k,x.name)},"Télécharger"))))}
+function renderP(){
+ const r=$("#p");if(r.children.length)return;
+ const info=h("p",{class:"m"},"Aucune photo choisie."),msg=h("p",{class:"m"},"");
+ const mk=(txt,cam)=>{const i=h("input",{type:"file",accept:"image/*"});if(cam)i.setAttribute("capture","environment");
+  i.onchange=async()=>{for(const f of i.files){try{PH2.push(await shrink(f))}catch(e){msg.textContent="Photo illisible."}}info.textContent=PH2.length+" photo(s) prête(s).";i.value=""};return h("div",{},h("label",{},txt),i)};
+ const sec=h("select",{},...["3 ans","4 ans","5 ans"].map(x=>h("option",{value:x,selected:x==="4 ans"},x))),
+  typ=h("select",{},h("option",{value:"auto"},"Automatique"),h("option",{value:"unique"},"Fiche unique"),h("option",{value:"seances"},"Fiche en plusieurs séances")),nt=h("input",{placeholder:"Précision (facultatif) : leçon, séance…"});
+ r.append(h("div",{class:"card"},h("b",{},"Demander une fiche pédagogique"),h("p",{class:"m"},"Photographiez la page du livret. L’administrateur prépare la fiche et vous la recevez ici en PDF."),mk("📁 Galerie"),mk("📷 Appareil photo",true),info,
+  h("div",{class:"g"},h("div",{},h("label",{},"Section"),sec),h("div",{},h("label",{},"Type de fiche"),typ)),h("label",{},"Précision"),nt,
+  h("div",{class:"row"},h("button",{class:"pri",onclick:async()=>{
+   if(!PH2.length){msg.textContent="Ajoutez au moins une photo.";return}
+   try{msg.textContent="Envoi…";if(!AUTH||AUTH.adm)await fbAuth("anon",{});const id=Date.now().toString(36),t=Date.now();
+    await fb("PUT","req/"+AUTH.uid+"/"+id,{t,name:TN,section:sec.value,type:typ.value,note:nt.value,imgs:PH2});
+    await fb("PUT","queue/"+AUTH.uid+"_"+id,{t,name:TN,uid:AUTH.uid,id,n:PH2.length,section:sec.value,note:nt.value,st:"attente"});
+    PH2=[];info.textContent="Aucune photo choisie.";nt.value="";msg.textContent="Demande envoyée ✓ Votre fiche apparaîtra ci-dessous dès qu’elle est prête."}catch(e){msg.textContent="Échec : "+e.message}}},"Envoyer la demande")),msg));
+ r.append(h("div",{class:"card",id:"rdy"}));renderRdy()}
+function reqCard(){
+ const box=h("div",{class:"card"},h("b",{},"Demandes de fiches (photos des enseignants)"));
+ if(!FBON()){box.append(h("p",{class:"m"},"Non configuré : la base Firebase n’est pas encore reliée."));return box}
+ const st=h("p",{class:"m"},"Connexion…"),body=h("div"),det=h("div");box.append(st,body,det);
+ let last="",q={};
+ const open=async k=>{const it=q[k];det.replaceChildren(h("p",{class:"m"},"Chargement des photos…"));
+  try{const d=await fb("GET","req/"+it.uid+"/"+it.id)||{},inf=h("p",{class:"m"},""),up=h("input",{type:"file",accept:"application/pdf,.pdf"});
+   up.onchange=async()=>{const f=up.files[0];if(!f)return;if(f.size>700000){inf.textContent="PDF trop lourd (700 Ko maximum).";return}
+    try{inf.textContent="Envoi…";const b64=await new Promise((ok,ko)=>{const rd=new FileReader();rd.onload=()=>ok(String(rd.result).split(",")[1]);rd.onerror=ko;rd.readAsDataURL(f)});
+     const rid=Date.now().toString(36);
+     await fb("PUT","readyFile/"+it.uid+"/"+rid,{b64});await fb("PUT","readyMeta/"+it.uid+"/"+rid,{name:f.name,t:Date.now(),rid:it.id});
+     await fb("PATCH","queue/"+it.uid+"_"+it.id,{st:"prête"});inf.textContent="Fiche envoyée à "+it.name+" ✓";load()}catch(e){inf.textContent="Échec : "+e.message}};
+   det.replaceChildren(h("div",{class:"card"},h("b",{},it.name+" · "+(d.section||"")+" · "+(d.type||"")),h("p",{class:"m"},d.note||"Sans précision."),
+    ...(d.imgs||[]).map((s,i)=>h("div",{},h("img",{src:s,style:"max-width:100%;border-radius:8px;margin:6px 0"}),h("div",{class:"row"},h("button",{onclick:()=>shareImg(s,"livret_"+it.name.replace(/\W+/g,"_")+"_"+(i+1)+".jpg")},"Partager / enregistrer la photo")))),
+    h("p",{class:"m"},"1) Envoyez la photo à Claude dans la conversation. 2) Téléchargez le PDF reçu. 3) Téléversez-le ici."),h("label",{},"Téléverser la fiche terminée (PDF)"),up,inf,
+    h("div",{class:"row"},h("button",{class:"del",onclick:async()=>{try{await fb("DELETE","queue/"+it.uid+"_"+it.id);await fb("DELETE","req/"+it.uid+"/"+it.id);det.replaceChildren();load()}catch(e){inf.textContent="Échec : "+e.message}}},"Supprimer la demande"))))
+  }catch(e){det.replaceChildren(h("p",{class:"m"},"Échec : "+e.message))}};
+ const draw=()=>{body.replaceChildren();const ks=Object.keys(q).sort((a,b)=>q[b].t-q[a].t);
+  if(!ks.length){body.append(h("p",{class:"m"},"Aucune demande pour le moment."));return}
+  ks.forEach(k=>{const it=q[k];body.append(h("div",{class:"it"},h("span",{},h("b",{},it.name),h("br"),h("span",{class:"m"},new Date(it.t).toLocaleString("fr-FR")+" · "+it.n+" photo(s) · "+(it.st==="prête"?"✅ prête":"⏳ en attente"))),h("button",{onclick:()=>open(k)},"Ouvrir")))})};
+ const load=async()=>{try{if(!AUTH||!AUTH.adm)await fbAuth("adm",{email:FB.admin,password:ls.get("admpw")||""});
+  q=await fb("GET","queue")||{};const j=JSON.stringify(q);if(j!==last){last=j;draw()}st.textContent="Mis à jour à "+new Date().toLocaleTimeString("fr-FR")+" (toutes les 6 s)"}catch(e){st.textContent="Erreur : "+e.message}};
+ load();clearInterval(RQT);RQT=setInterval(load,6000);return box}
 /* ---------- ACCÈS PAR CODE ---------- */
 function renderG(err){
  const g=$("#g");g.replaceChildren();
@@ -352,7 +406,7 @@ function renderA(){
  const LINK=location.href.split("#")[0],MSG="Bonjour, voici l’Espace Enseignant (fiches pédagogiques, gestion de classe, documents obligatoires). Pour l’activer : envoyez "+PRIX+" FCFA par Airtel Money au "+NUM+", puis envoyez-moi votre nom et la référence du paiement : je vous donnerai votre code d’accès. Lien : "+LINK;
  const sh=h("div",{class:"card"},h("b",{},"Partager l’application avec mes clients"),h("p",{class:"m"},"Le bouton envoie le message ci-dessous avec le lien de votre site : tout le monde peut l’ouvrir, et l’accès se fait avec le code."),h("textarea",{readOnly:true,value:MSG}),
   h("div",{class:"row"},h("button",{class:"pri",onclick:async()=>{try{if(navigator.share){await navigator.share({title:"Espace Enseignant",text:MSG});return}}catch(e){if(e&&e.name==="AbortError")return}try{await navigator.clipboard.writeText(MSG);note("Message copié : collez-le dans WhatsApp.")}catch(e){const t=sh.querySelector("textarea");t.focus();t.select();note("Appui long sur le texte pour le copier.")}}},"Partager"),h("a",{href:"https://wa.me/?text="+encodeURIComponent(MSG),target:"_blank",rel:"noopener",style:"display:inline-block;border:1px solid var(--p);border-radius:8px;padding:9px 12px;color:var(--p);text-decoration:none"},"WhatsApp")));
- r.append(sh);r.append(supCard());r.append(ensCard());
+ r.append(sh);r.append(reqCard());r.append(supCard());r.append(ensCard());
  const nm=h("input",{placeholder:"Nom de l’enseignant"}),du=h("select",{},...[["2 semaines",14],["1 mois",30],["3 mois",90],["1 an",365],["Sans limite",0]].map(x=>h("option",{value:x[1]},x[0]))),out=h("textarea",{readOnly:true,placeholder:"Le code apparaît ici"}),msg=h("p",{class:"m"},"");
  r.append(h("div",{class:"card"},h("b",{},"Générer un code d’accès"),h("p",{class:"m"},"Après avoir vérifié le paiement Airtel Money, créez le code de l’enseignant et envoyez-le lui (WhatsApp ou SMS)."),h("label",{},"Nom"),nm,h("label",{},"Durée"),du,
   h("div",{class:"row"},h("button",{class:"pri",onclick:async()=>{
@@ -374,5 +428,5 @@ function regList(){
 }
 /* ---------- DÉMARRAGE ---------- */
 renderF();renderC();renderD();
-(async()=>{renderF();renderD();await boot()})();
+(async()=>{await loadCfg();renderF();renderD();await boot()})();
 </script></body></html>
