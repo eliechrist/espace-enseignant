@@ -33,7 +33,7 @@ button.del{border-color:var(--r);color:var(--r)}
 .m{color:var(--m);font-size:13px}
 a.dl{color:var(--p);font-weight:600}
 .hid{display:none}
-body.locked nav,body.locked #f,body.locked #c,body.locked #d,body.locked #m,body.locked #p{display:none!important}
+body.locked nav,body.locked #f,body.locked #c,body.locked #d,body.locked #m,body.locked #p,body.locked #e,body.locked #v,body.locked #r,body.locked #l{display:none!important}
 body:not(.locked) #g{display:none}
 
 header{background:linear-gradient(135deg,var(--p),#1d4f37);text-align:center;padding:10px 16px 16px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
@@ -52,7 +52,7 @@ input,select,textarea{border-radius:10px}
 </style></head><body class="locked">
 <header><div class="cr">Créé par Élie Christ MBERAGANA 066.14.25.42</div><h1>📚 Espace Enseignant</h1><small id="who">Chargement…</small></header>
 <div class="gabon"></div>
-<nav><button data-t="a" class="hid">⚙ Admin</button><button data-t="f" class="on">Fiches pédagogiques</button><button data-t="c">Gestion de classe</button><button data-t="d">Documents obligatoires</button><button data-t="p" class="hid">📷 Fiche par photo</button><button data-t="m" class="hid">✉ Messages</button></nav>
+<nav><button data-t="a" class="hid">⚙ Admin</button><button data-t="f" class="on">Fiches</button><button data-t="p" class="hid">📷 Fiche par photo</button><button data-t="c">Classe</button><button data-t="e">👥 Élèves</button><button data-t="v">📝 Évaluations</button><button data-t="r">📊 Résultats</button><button data-t="l">📅 Planning</button><button data-t="d">📁 Documents</button><button data-t="m" class="hid">✉ Messages</button></nav>
 <main>
 <section id="g"></section>
 <section id="a" class="hid"></section>
@@ -61,6 +61,10 @@ input,select,textarea{border-radius:10px}
 <section id="d" class="hid"></section>
 <section id="p" class="hid"></section>
 <section id="m" class="hid"></section>
+<section id="e" class="hid"></section>
+<section id="v" class="hid"></section>
+<section id="r" class="hid"></section>
+<section id="l" class="hid"></section>
 </main>
 <p id="ver" style="text-align:center;color:var(--m);font-size:12px;margin:0 0 28px"></p>
 <script>
@@ -69,7 +73,7 @@ function h(t,a={},...k){const e=document.createElement(t);for(const[x,v]of Objec
 let dl=null,db=null,admin=false,TN="",OBS="",RM="",SELM="";
 const mem={};const ls={get:k=>{try{const v=localStorage.getItem(k);return v==null?(k in mem?mem[k]:null):JSON.parse(v)}catch(e){return k in mem?mem[k]:null}},set:(k,v)=>{mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 function note(m){let n=$("#note");if(!n){n=h("div",{id:"note",style:"position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));background:var(--t);color:var(--bg);padding:12px;border-radius:10px;z-index:9"});document.body.append(n)}n.textContent=m;n.style.display="block";clearTimeout(n._t);n._t=setTimeout(()=>n.style.display="none",6000)}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));["a","f","c","d","m","p"].forEach(i=>$("#"+i).classList.toggle("hid",i!==b.dataset.t))});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));["a","f","c","d","m","p","e","v","r","l"].forEach(i=>$("#"+i).classList.toggle("hid",i!==b.dataset.t));const rr={e:renderE,v:renderV,r:renderR,l:renderL,c:renderC}[b.dataset.t];if(rr)rr()});
 const PUB={x:"Xb9EWnPOgTK1uhADGYALhMHzTnNn0REOwuV1e_yNP4s",y:"0-EQaTBG9sMyehFVNGCZZnO2oEO-Og1oeT2FbhmjxdE"},NUM="074.23.88.80",PRIX=2000,REV=[],DOCS=[];
 const ADM={s:"RG6zXsy_BIeFfLJ2_xf0hQ",i:"zNxAmUVfDhy67zq4",c:"WxKn2Wz564nEtT0uBPCw41OXHgmmcD5WBYRMXHkuW0tMoiqmNvrsdebcu1W_H2jTbZcpbmB0BApdbUg"};
 const enc=new TextEncoder(),ECA={name:"ECDSA",namedCurve:"P-256"},SIG={name:"ECDSA",hash:"SHA-256"};
@@ -111,9 +115,10 @@ function renderF(){
  r.append(h("div",{class:"card"},h("label",{},"Composante"),sel,
   h("div",{class:"g"},field("Palier","palier"),field("CB","cb"),field("Section","section"),field("Durée","duree"),field("N° de fiche","num"),field("Date","date")),
   field("Savoir","savoir"),field("Savoir-faire","sf","ta"),field("Savoir-être (facultatif)","se"),field("Mode de travail","mode"),field("Objectif de la leçon","obj","ta"),field("Matériel/supports","mat","ta"),field("N.B. (conseils)","nb","ta")));
+ r.append(imgsCard(F,"Images de la fiche (illustrations)",renderF));
  const box=h("div",{class:"card"},h("b",{},"Déroulement"));
  F.rows.forEach((x,i)=>{
-  const bar=h("div",{class:"row"},h("button",{class:"del",onclick:()=>{F.rows.splice(i,1);renderF()}},"Supprimer"));
+  const bar=h("div",{class:"row"},h("button",{class:"del",onclick:()=>{F.rows.splice(i,1);renderF()}},"Supprimer"),...rowImgBtns(x,renderF));
   if(x.s){const t=h("textarea");t.value=x.a;t.oninput=()=>x.a=t.value;box.append(h("div",{class:"it",style:"display:block"},h("label",{},"Titre de séance (ex. Première séance : … Objectif : …)"),t,bar));return}
   const a=h("textarea");a.value=x.a;a.oninput=()=>x.a=a.value;
   const b=h("textarea");b.value=x.b;b.oninput=()=>x.b=b.value;
@@ -135,11 +140,12 @@ async function pdf(f){
   L("Palier : "+(f.palier||"")+"   CB : "+(f.cb||"")+"   Section : "+(f.section||""),"");
   L("Composante :",f.comp);L("Date :",f.date);L("Savoir :",f.savoir);L("Durée :",f.duree);L("Savoir-faire :",f.sf);
   if(f.se)L("Savoir-être :",f.se);L("Mode de travail :",f.mode);L("Objectif de la leçon :",f.obj);L("Matériel/supports :",f.mat);
+  for(const im of(f.imgs||[])){const q=fitImg(im,80,55);if(y+q.h>270){d.addPage();y=20}d.addImage(q.d,"JPEG",105-q.w/2,y,q.w,q.h);y+=q.h+4}
   d.setFont("times","bold");d.text("DÉROULEMENT",105,y+2,{align:"center"});
   d.autoTable({startY:y+5,margin:{left:15,right:15},head:[["Progression","Activités du maître","Activités de l’élève"]],
-   body:f.rows.map(r=>r.s?[{content:r.a,colSpan:3,styles:{fontStyle:"bold",fillColor:[230,230,230]}}]:[r.a,r.b,r.c]),
+   body:f.rows.flatMap(r=>{const b=r.s?[{content:r.a,colSpan:3,styles:{fontStyle:"bold",fillColor:[230,230,230]}}]:[r.a,r.b,r.c];if(!r.img)return[b];const q=fitImg(r.img,90,60);return[b,[{content:"",colSpan:3,styles:{minCellHeight:q.h+4},_img:q}]]}),
    styles:{font:"times",fontSize:10,textColor:0,lineColor:0,lineWidth:.2,cellPadding:2},headStyles:{fillColor:255,textColor:0,halign:"center"},
-   columnStyles:{0:{cellWidth:40},1:{cellWidth:85},2:{cellWidth:55}}});
+   columnStyles:{0:{cellWidth:40},1:{cellWidth:85},2:{cellWidth:55}},didDrawCell:x=>{const q=x.cell.raw&&x.cell.raw._img;if(q&&x.section==="body")d.addImage(q.d,"JPEG",x.cell.x+(x.cell.width-q.w)/2,x.cell.y+2,q.w,q.h)}});
   if(f.nb){let y2=d.lastAutoTable.finalY+7;d.setFont("times","normal");d.setFontSize(10);const t=d.splitTextToSize("N.B. : "+f.nb,180);if(y2+t.length*5>280){d.addPage();y2=20}d.text(t,15,y2)}
   const n=d.getNumberOfPages();for(let i=1;i<=n;i++){d.setPage(i);d.setFontSize(8);d.setFont("times","normal");d.text("Module de formation des Enseignants du Pré primaire : Manuels Super (GS)-IPN/GABON",15,290);d.text("Page "+i,195,290,{align:"right"})}
   const name="Fiche_"+(f.comp||"").replace(/[^\wÀ-ÿ]+/g,"_")+"_"+(f.savoir||"").slice(0,30).replace(/[^\wÀ-ÿ]+/g,"_")+".pdf";
@@ -167,7 +173,7 @@ async function prep(file){const bm=await createImageBitmap(file);const k=Math.mi
 let GC=null;
 function genCard(){
  if(GC)return GC;
- const sec=h("select",{},...["3 ans","4 ans","5 ans"].map(x=>h("option",{value:x,selected:x==="4 ans"},x)));
+ const sec=h("select",{},...["3 ans","4 ans","5 ans","1ère année","2e année","3e année","4e année","5e année"].map(x=>h("option",{value:x,selected:x==="4 ans"},x)));
  const typ=h("select",{},h("option",{value:"auto"},"Automatique (selon le modèle de la composante)"),h("option",{value:"unique"},"Fiche unique"),h("option",{value:"seances"},"Fiche en plusieurs séances"));
  let PH=[];const fi={get files(){return PH}};
  const info=h("p",{class:"m"},"Aucune photo choisie. Si le sélecteur ne s’ouvre pas, ouvrez cette page dans le navigateur du téléphone (Chrome, Safari) plutôt que dans l’application Claude.");
@@ -205,18 +211,11 @@ function renderC(){
  const lst=h("div",{class:"card"},h("b",{},"Appel du "+today.split("-").reverse().join("/")),h("p",{class:"m"},"Présents : "+p.length+" / "+C.eleves.length));
  C.eleves.forEach((n,i)=>{const cb=h("input",{type:"checkbox",checked:p.includes(n),style:"width:auto"});
   cb.onchange=()=>{const s=new Set(C.pres[today]||[]);cb.checked?s.add(n):s.delete(n);C.pres[today]=[...s];saveC();renderC()};
-  lst.append(h("div",{class:"it"},h("label",{style:"display:flex;gap:8px;align-items:center;margin:0;color:var(--t);font-size:15px"},cb,n),h("button",{class:"del",onclick:()=>{C.eleves.splice(i,1);saveC();renderC()}},"✕")))});
+  lst.append(h("div",{class:"it"},h("label",{style:"display:flex;gap:8px;align-items:center;margin:0;font-size:15px;color:"+sexCol(n)},cb,n),h("button",{class:"del",onclick:()=>{C.eleves.splice(i,1);saveC();renderC()}},"✕")))});
  r.append(lst);r.append(reportCard());
 }
 
 
-/* ---------- DOCUMENTS ---------- */
-function renderD(){
- const r=$("#d");r.replaceChildren();
- const box=h("div",{class:"card"},h("b",{},"Documents obligatoires"));r.append(box);
- if(!DOCS.length)box.append(h("p",{class:"m"},"Aucun document pour le moment."));
- DOCS.forEach(d=>box.append(h("div",{class:"it"},h("span",{},d.titre,h("br"),h("span",{class:"m"},d.nom)),h("button",{class:"pri",onclick:async()=>{try{const b=await(await fetch(d.uri)).blob();const a=h("a",{href:URL.createObjectURL(b),download:d.nom});document.body.append(a);a.click();a.remove()}catch(e){if(!e||e.code!=="declined")note("Échec : "+((e&&e.message)||e))}}},"Télécharger"))));
-}
 /* ---------- RAPPORTS MENSUELS ---------- */
 const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 const ml=m=>{const[a,b]=m.split("-");return MOIS[+b-1]+" "+a};
@@ -277,7 +276,7 @@ function ensPdf(m,cur,gen){try{const d=new window.jspdf.jsPDF({unit:"mm",format:
  savePdf(d,"Rapport_ensemble_"+m+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
 /* ---------- FIREBASE : SUIVI EN TEMPS RÉEL ET MESSAGES ---------- */
 const FB={key:"",db:"",admin:"admin@espace-enseignant.app"};
-async function loadCfg(){try{const t=await(await fetch("config.txt",{cache:"no-store"})).text(),k=t.match(/apiKey\s*[:=]\s*["']([^"']+)["']/),d=t.match(/databaseURL\s*[:=]\s*["']([^"']+)["']/);if(k)FB.key=k[1];if(d)FB.db=d[1]}catch(e){}const v=$("#ver");if(v)v.textContent="Version 2.2 · Serveur : "+(FBON()?"configuré":"non configuré")}
+async function loadCfg(){try{const t=await(await fetch("config.txt",{cache:"no-store"})).text(),k=t.match(/apiKey\s*[:=]\s*["']([^"']+)["']/),d=t.match(/databaseURL\s*[:=]\s*["']([^"']+)["']/);if(k)FB.key=k[1];if(d)FB.db=d[1]}catch(e){}const v=$("#ver");if(v)v.textContent="Version 3.0 · Serveur : "+(FBON()?"configuré":"non configuré")}
 const FBON=()=>!!(FB.key&&FB.db&&FB.admin);
 const canon=pw=>{const q=pw.replace(/[\s-]/g,"").toUpperCase();return q.slice(0,4)+"-"+q.slice(4,8)+"-"+q.slice(8)};
 let AUTH=ls.get("fbauth"),MSGS=[],syncT=0,SUPT=0,SUPSEL=null,SUPMT="";
@@ -300,11 +299,12 @@ function syncReport(){
  if(!FBON()||admin||!TN)return;clearTimeout(syncT);
  syncT=setTimeout(async()=>{try{
   if(!AUTH||AUTH.adm)await fbAuth("anon",{});
-  await fb("PATCH","reports/"+AUTH.uid,{t:TN,cls:C.nom||"",last:Date.now()});
+  await fb("PATCH","reports/"+AUTH.uid,{t:TN,cid:CID,cls:C.nom||"",last:Date.now()});
   for(const m of new Set([today.slice(0,7),RM||today.slice(0,7)]))await fb("PUT","reports/"+AUTH.uid+"/months/"+m,{...stats(m),m,obs:m===(RM||today.slice(0,7))?OBS:""});
  }catch(e){}},1500)}
 async function pollInbox(){
  if(!FBON()||admin||!AUTH)return;
+ await checkBlk();
  try{const j=await fb("GET","inbox/"+AUTH.uid)||{};MSGS=Object.values(j).sort((a,b)=>b.t-a.t);
   const b=$('[data-t="m"]');if(!$("#m").classList.contains("hid"))ls.set("seen",Date.now());
   const nw=MSGS.filter(x=>x.t>(+ls.get("seen")||0)).length;b.textContent="✉ Messages"+(nw?" ("+nw+")":"");renderM()}catch(e){}
@@ -335,11 +335,11 @@ function supCard(){
   const ids=Object.keys(data).sort((a,b)=>(data[b].last||0)-(data[a].last||0));
   if(!ids.length){body.append(h("p",{class:"m"},"Aucun enseignant connecté pour le moment."));return}
   ids.forEach(id=>{const d=data[id],ms=Object.keys(d.months||{}).sort().reverse(),c=ms[0]?d.months[ms[0]]:null;
-   body.append(h("div",{class:"it"},h("span",{},h("b",{},d.t||"Enseignant"),h("br"),h("span",{class:"m"},(d.cls||"classe")+" · actif il y a "+ago(d.last||0)+(c?" · présence "+c.taux+" % · "+c.fiches+" fiche(s)":""))),h("button",{onclick:()=>{SUPSEL=id;draw()}},"Ouvrir")))});
+   body.append(h("div",{class:"it"},h("span",{},h("b",{},d.t||"Enseignant"),h("br"),h("span",{class:"m"},(d.cls||"classe")+" · actif il y a "+ago(d.last||0)+(c?" · présence "+c.taux+" % · "+c.fiches+" fiche(s)":""))),h("span",{class:"row",style:"margin:0"},h("button",{onclick:()=>{SUPSEL=id;draw()}},"Ouvrir"),...admBtns(id,d,load))))});
   if(SUPSEL&&data[SUPSEL])detail(SUPSEL)};
  const load=async()=>{try{
   if(!AUTH||!AUTH.adm)await fbAuth("adm",{email:FB.admin,password:ls.get("admpw")||""});
-  data=await fb("GET","reports")||{};const j=JSON.stringify(data);if(j!==last){last=j;draw()}
+  data=await fb("GET","reports")||{};BLK=await fb("GET","blocked")||{};const j=JSON.stringify([data,BLK]);if(j!==last){last=j;draw()}
   st.textContent="Mis à jour à "+new Date().toLocaleTimeString("fr-FR")+" (toutes les 6 s)"}catch(e){st.textContent="Erreur : "+e.message}};
  load();clearInterval(SUPT);SUPT=setInterval(load,6000);return box}
 
@@ -369,7 +369,7 @@ function renderP(){
   info=h("p",{class:"m"},"Aucune photo choisie."),msg=h("p",{class:"m"},"");
  const mk=(txt,cam)=>{const i=h("input",{type:"file",accept:"image/*"});if(cam)i.setAttribute("capture","environment");
   i.onchange=async()=>{for(const f of i.files){try{PH2.push(await shrink(f))}catch(e){msg.textContent="Photo illisible."}}info.textContent=PH2.length+" photo(s) prête(s).";i.value=""};return h("div",{},h("label",{},txt),i)};
- const sec=h("select",{},...["3 ans","4 ans","5 ans"].map(x=>h("option",{value:x,selected:x==="4 ans"},x))),
+ const sec=h("select",{},...["3 ans","4 ans","5 ans","1ère année","2e année","3e année","4e année","5e année"].map(x=>h("option",{value:x,selected:x==="4 ans"},x))),
   typ=h("select",{},h("option",{value:"auto"},"Automatique"),h("option",{value:"unique"},"Fiche unique"),h("option",{value:"seances"},"Fiche en plusieurs séances")),nt=h("input",{placeholder:"Précision (facultatif) : leçon, séance…"});
  const send=async()=>{
   if(!PH2.length){msg.textContent="Ajoutez au moins une photo.";return}
@@ -421,7 +421,7 @@ async function boot(){
  const ak=ls.get("adminkey");if(ak&&ak.d)admin=true;
  if(admin){renderF();document.body.classList.remove("locked");document.body.classList.add("adm");$("#who").textContent="Administrateur";const t=document.querySelector('[data-t="a"]');t.classList.remove("hid");t.click();renderA();return}
  const c=ls.get("acc"),r=c?await verify(c):null;
- if(r&&!r.err){TN=r.n;document.body.classList.remove("locked");startTeacher();$("#who").textContent="Bonjour "+r.n+(r.e?" · accès jusqu’au "+new Date(r.e).toLocaleDateString("fr-FR"):"")}
+ if(r&&!r.err){TN=r.n;CID=r.i;document.body.classList.remove("locked");if(ls.get("blk"))lockBlocked();startTeacher();$("#who").textContent="Bonjour "+r.n+(r.e?" · accès jusqu’au "+new Date(r.e).toLocaleDateString("fr-FR"):"")}
  else{document.body.classList.add("locked");$("#who").textContent="Accès à activer";renderG(r&&r.err)}
 }
 /* ---------- ADMINISTRATION ---------- */
@@ -445,17 +445,417 @@ function renderA(){
     out.value=p+"."+sg;out.focus();out.select();
     const reg=ls.get("reg")||[];reg.unshift({...pl,t:Date.now()});ls.set("reg",reg);msg.textContent="Code créé : appui long sur le texte pour copier, puis envoyez-le.";regList()}catch(e){msg.textContent="Échec : "+e.message}}},"Générer le code")),out,msg));
  r.append(h("div",{class:"card",id:"reg"}));regList();
- r.append(h("div",{class:"card"},h("b",{},"Documents obligatoires"),h("p",{class:"m"},"Pour ajouter ou retirer un document, envoyez-le moi dans la conversation : je le mets dans l’application et je vous renvoie le fichier mis à jour (à remplacer sur votre hébergement).")));
+ r.append(h("div",{class:"card"},h("b",{},"Documents obligatoires"),h("p",{class:"m"},"Les documents sont les fichiers « doc-… » placés à la racine de votre dépôt GitHub. Pour en ajouter ou en remplacer un : Add file, Upload files, avec le même nom, puis Commit changes.")));
 }
 function regList(){
  const b=$("#reg");if(!b)return;const reg=ls.get("reg")||[];
  b.replaceChildren(h("b",{},"Codes créés (sur cet appareil)"));
  if(!reg.length)b.append(h("p",{class:"m"},"Aucun code créé."));
- reg.forEach((x,i)=>b.append(h("div",{class:"it"},h("span",{},x.n,h("br"),h("span",{class:"m"},"id "+x.i+" · "+(x.e?"jusqu’au "+new Date(x.e).toLocaleDateString("fr-FR"):"sans limite")+(x.rv?" · À BLOQUER":"")+(REV.includes(x.i)?" · bloqué":""))),h("button",{class:x.rv?"":"del",onclick:()=>{x.rv=!x.rv;ls.set("reg",reg);regList()}},x.rv?"Annuler":"Bloquer"))));
+ reg.forEach((x,i)=>b.append(h("div",{class:"it"},h("span",{},x.n,h("br"),h("span",{class:"m"},"id "+x.i+" · "+(x.e?"jusqu’au "+new Date(x.e).toLocaleDateString("fr-FR"):"sans limite")+(x.rv?" · À BLOQUER":"")+(REV.includes(x.i)?" · bloqué":""))),h("span",{class:"row",style:"margin:0"},h("button",{class:x.rv?"":"del",onclick:async()=>{x.rv=!x.rv;ls.set("reg",reg);if(FBON()){try{await ensureAdm();if(x.rv)await fb("PUT","blocked/"+x.i,true);else await fb("DELETE","blocked/"+x.i)}catch(e){note("Serveur : "+e.message)}}regList()}},x.rv?"Annuler":"Bloquer"),confirmBtn("Supprimer","del",async()=>{if(FBON()){await ensureAdm();const rp=await fb("GET","reports")||{},u=Object.keys(rp).find(k=>rp[k].cid===x.i);if(u)await delTeacher(u,x.i);else await fb("PUT","blocked/"+x.i,true)}const r2=(ls.get("reg")||[]).filter(z=>z.i!==x.i);ls.set("reg",r2);regList();if(typeof SUPT!=="undefined")note("Enseignant supprimé.")})))));
  const rv=reg.filter(x=>x.rv).map(x=>x.i);
  if(rv.length)b.append(h("p",{class:"m"},"Pour bloquer ces codes pour tout le monde, envoyez-moi ces identifiants et je vous renvoie le fichier mis à jour : "+rv.join(", ")));
 }
+/* ---------- EXTENSION : CLASSE COMPLÈTE (pré-primaire et primaire) ---------- */
+const H=(t,a,...k)=>h(t,a||{},...k.flat(9).filter(x=>x!==null&&x!==undefined&&x!==false));
+const cd=(t,p)=>H("div",{class:"card"},H("b",{},t),H("p",{class:"m"},p));
+["Français","Mathématiques","EDM / EAS (Éveil)"].forEach(x=>{if(!COMPS.includes(x))COMPS.push(x)});
+const LV=[
+ {k:"pp3",l:"Petite section (3 ans)",pp:1},{k:"pp4",l:"Moyenne section (4 ans)",pp:1},{k:"pp5",l:"Grande section (5 ans)",pp:1},
+ {k:"p1",l:"1ère année primaire",y:1,pr:1},{k:"p2",l:"2e année primaire",y:2},{k:"p3",l:"3e année primaire",y:3,pr:1},
+ {k:"p4",l:"4e année primaire",y:4},{k:"p5",l:"5e année primaire",y:5,pr:1}];
+const lvi=()=>LV.find(x=>x.k===(C.lv||"pp4"))||LV[1];
+const isPP=()=>!!lvi().pp;
+const NBP=()=>isPP()?6:5;
+function ci(n){C.info=C.info||{};return C.info[n]||(C.info[n]={s:"",dn:"",ln:"",nat:"Gabonaise",st:"N",et:"",dec:""})}
+const sexCol=n=>{const s=((C.info||{})[n]||{}).s;return s==="F"?"#c62828":s==="G"?"#1565c0":"var(--t)"};
+const fdate=v=>{if(!v)return"";const p=String(v).split("-");return p.length===3?p[2]+"/"+p[1]+"/"+p[0]:v};
+const ecoleLine=()=>"ECOLE : "+(C.ecole||"……………………")+"     Classe de : "+(C.nom||lvi().l)+"     Année scolaire : "+(C.annee||"2026-2027");
+
+/* ----- images (aperçu, réduction, insertion dans PDF) ----- */
+async function imgPick(file,max){max=max||900;const bm=await createImageBitmap(file),k=Math.min(1,max/Math.max(bm.width,bm.height)),c=document.createElement("canvas");
+ c.width=Math.max(1,Math.round(bm.width*k));c.height=Math.max(1,Math.round(bm.height*k));const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(bm,0,0,c.width,c.height);
+ return{d:c.toDataURL("image/jpeg",.75),w:c.width,h:c.height}}
+function pickFile(multi,cb){const i=document.createElement("input");i.type="file";i.accept="image/*";i.multiple=!!multi;i.style.display="none";document.body.append(i);
+ i.onchange=async()=>{try{for(const f of i.files){try{cb(await imgPick(f))}catch(e){note("Image illisible : "+f.name)}}}finally{i.remove()}};i.click()}
+function imgsCard(obj,title,redraw){
+ const box=H("div",{class:"card"},H("b",{},title),H("p",{class:"m"},"Ajoutez des images de votre choix (galerie ou appareil photo)."));
+ (obj.imgs||[]).forEach((im,i)=>box.append(H("div",{class:"it"},H("img",{src:im.d,style:"height:64px;border-radius:8px"}),H("button",{class:"del",onclick:()=>{obj.imgs.splice(i,1);redraw()}},"Retirer"))));
+ box.append(H("div",{class:"row"},H("button",{onclick:()=>pickFile(true,im=>{obj.imgs=obj.imgs||[];obj.imgs.push(im);redraw()})},"🖼 Ajouter une image")));return box}
+function rowImgBtns(x,redraw){
+ const a=[H("button",{onclick:()=>pickFile(false,im=>{x.img=im;redraw()})},x.img?"🖼 Changer l’image":"🖼 Image")];
+ if(x.img){a.push(H("img",{src:x.img.d,style:"height:36px;border-radius:6px"}));a.push(H("button",{class:"del",onclick:()=>{delete x.img;redraw()}},"Retirer l’image"))}
+ return a}
+function fitImg(im,mw,mh){const k=Math.min(mw/im.w,mh/im.h);return{d:im.d,w:im.w*k,h:im.h*k}}
+
+/* ----- PDF : utilitaires ----- */
+const pdfNew=land=>new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:land?"landscape":"portrait"});
+const PS=(fs,extra)=>Object.assign({font:"helvetica",fontSize:fs||8,textColor:0,lineColor:0,lineWidth:.2,cellPadding:1,halign:"center",valign:"middle"},extra||{});
+const HS={fillColor:255,textColor:0,fontStyle:"bold"};
+function face(d,cx,cy,r,t){d.setDrawColor(0);d.setFillColor(0);d.setLineWidth(.25);d.circle(cx,cy,r);d.circle(cx-r*.35,cy-r*.25,.28,"F");d.circle(cx+r*.35,cy-r*.25,.28,"F");
+ if(t===0){d.line(cx-r*.4,cy+r*.35,cx-r*.1,cy+r*.55);d.line(cx-r*.1,cy+r*.55,cx+r*.1,cy+r*.55);d.line(cx+r*.1,cy+r*.55,cx+r*.4,cy+r*.35)}
+ else if(t===1)d.line(cx-r*.4,cy+r*.45,cx+r*.4,cy+r*.45);
+ else{d.line(cx-r*.4,cy+r*.6,cx-r*.1,cy+r*.4);d.line(cx-r*.1,cy+r*.4,cx+r*.1,cy+r*.4);d.line(cx+r*.1,cy+r*.4,cx+r*.4,cy+r*.6)}}
+const MINIST=["MINISTERE DE L’EDUCATION NATIONALE ET DE L’INSTRUCTION CIVIQUE","***************","SECRETARIAT GENERAL","***************"];
+function ministHead(d,x,y,w){let yy=y;d.setFont("times","normal");d.setFontSize(8.5);
+ [...MINIST,"DIRECTION D’ACADEMIE PROVINCIALE DU "+(C.dap||"WOLEU-NTEM"),"***************","CIRCONSCRIPTION SCOLAIRE DU "+(C.circ||"WOLEU-NTEM CENTRE"),"***************"].forEach(t=>{d.splitTextToSize(t,w).forEach(l=>{d.text(l,x+w/2,yy,{align:"center"});yy+=3.6})});return yy}
+
+/* ----- Évaluations (modèle « Evaluation Bilan ») ----- */
+const GRID={
+ p1:{l:"1 question (C1 /1 · C2 /2 · total /3)",h:["S","C1","C2","C3"],b:[["Q","/1","/2",""],["T",{c:3,t:"/3"}]]},
+ p2:{l:"2 questions (total /5)",h:["S","C1","C2","C3"],b:[["Q1","/1","/1",""],["Q2","/1","/1","/1"],["T",{c:3,t:"/5"}]]},
+ p3:{l:"3 questions (total /10)",h:["S","C1","C2","C3"],b:[["Q1","/1","/2",""],["Q2","/1","/2",""],["Q3","/1","/2","/1"],["T",{c:3,t:"/10"}]]},
+ pr:{l:"Primaire : 3 questions (C1, C2, C3 /3 · C4 /1 · total /9)",h:["S","C1","C2","C3","C4"],b:[["Q1","/1","/1","/1",""],["Q2","/1","/1","/1",""],["Q3","/1","/1","/1",""],["T","/3","/3","/3","/1"],["Total",{c:4,t:"/9 (+1 présentation)"}]]},
+ aucune:{l:"Sans grille",h:null,b:[]}};
+const DOMS=()=>isPP()?["Mathématiques","Communication/Expression","Éveil"]:["Mathématiques","Français","EDM / EAS (Éveil)"];
+const COMPOS=["Géométrie /Mesure / Logique","langage /Conte/Poésie","Lecture /Graphisme/Ecriture","Psychomotricité","Education civisme /Morale/routière","Dessin / Activités manuelles /Peinture","Eveil scientifique /Technologique","Education à la santé / à l’environnement"];
+let EV={dom:"",pal:"1",comp:"",cl:"",titre:"",ctx:"",cons:"",imgs:[],gr:"p1"};
+function evalPdf(e){
+ try{const d=pdfNew(false);d.setFont("times","bold");d.setFontSize(9);d.text("EVALUATION BILAN",105,12,{align:"center"});
+  d.autoTable({startY:15,margin:{left:10,right:10},theme:"grid",styles:PS(9,{halign:"left",font:"times",cellPadding:2}),
+   body:[[{content:"Domaine : "+(e.dom||""),styles:{fontStyle:"italic"}},{content:"Palier : "+(e.pal||""),styles:{fontStyle:"italic"}},{content:"Composante : "+(e.comp||""),styles:{fontStyle:"italic"}}],
+   [{content:"Date :\n\nPrénoms :",colSpan:2,styles:{minCellHeight:16}},{content:"Classe :\n"+(e.cl||(C.nom||lvi().l)),styles:{halign:"center",fontStyle:"bold"}}]],
+   columnStyles:{0:{cellWidth:85},1:{cellWidth:30},2:{cellWidth:75}}});
+  let y=d.lastAutoTable.finalY+9;d.setFont("times","bold");d.setFontSize(14);d.text(d.splitTextToSize(e.titre||"",180),105,y,{align:"center"});y+=9;
+  d.setFont("times","normal");d.setFontSize(12);const cx=d.splitTextToSize(e.ctx||"",180);d.text(cx,15,y);y+=cx.length*5.6+4;
+  for(const im of(e.imgs||[])){const f=fitImg(im,150,95);if(y+f.h>215){d.addPage();y=15}d.addImage(f.d,"JPEG",105-f.w/2,y,f.w,f.h);y+=f.h+4}
+  const cons=(e.cons||"").split("\n").map(x=>x.trim()).filter(Boolean);
+  if(y>225){d.addPage();y=20}
+  const g=GRID[e.gr]||GRID.p1;let yc=Math.max(y+4,228);
+  d.setFont("helvetica","bold");d.setFontSize(9);d.text("Consigne :",12,yc);d.setFont("helvetica","bold");d.setFontSize(10.5);
+  let yy=yc+7;cons.forEach((c,i)=>{const t=d.splitTextToSize((cons.length>1?(i+1)+"- ":"")+c,g.h?118:180);d.text(t,16,yy);yy+=t.length*5+2});
+  if(g.h){const w=g.h.length;
+   d.autoTable({startY:yc-3,margin:{left:200-(w*11),right:10},tableWidth:w*11,theme:"grid",styles:PS(8),
+    body:[g.h.map(x=>({content:x,styles:{fillColor:[225,225,225]}})),...g.b.map(r=>r.map(c=>typeof c==="object"?{content:c.t,colSpan:c.c}:c))],
+    });
+   const fy=d.lastAutoTable.finalY;d.setLineWidth(.2);d.rect(200-(w*11),fy,w*11,9);
+   if(w>=4)[0,1,2].forEach(t=>face(d,200-(w*11)+11*(t+1)+5.5,fy+4.5,3,t))}
+  const name="Evaluation_"+(e.titre||"bilan").replace(/[^\wÀ-ÿ]+/g,"_").slice(0,40)+".pdf";savePdf(d,name)}
+ catch(err){note("Échec : "+((err&&err.message)||err))}}
+function renderV(){
+ const r=$("#v");r.replaceChildren();
+ if(!EV.dom)EV.dom=DOMS()[0];
+ const fld=(lab,k,ta)=>{const i=ta?h("textarea"):h("input");i.value=EV[k]||"";i.oninput=()=>EV[k]=i.value;return H("div",{},h("label",{},lab),i)};
+ const dom=h("select",{},...DOMS().map(x=>h("option",{value:x,selected:x===EV.dom},x)));dom.onchange=()=>EV.dom=dom.value;
+ const pal=h("select",{},...Array.from({length:NBP()},(_,i)=>h("option",{value:String(i+1),selected:String(i+1)===EV.pal},"Palier "+(i+1))));pal.onchange=()=>EV.pal=pal.value;
+ const gr=h("select",{},...Object.keys(GRID).map(k=>h("option",{value:k,selected:k===EV.gr},GRID[k].l)));gr.onchange=()=>EV.gr=gr.value;
+ const dl2=h("datalist",{id:"compos"},...COMPOS.map(x=>h("option",{value:x})));
+ const ci2=fld("Composante","comp");ci2.querySelector("input").setAttribute("list","compos");
+ r.append(H("div",{class:"card"},H("b",{},"📝 Évaluation (modèle « Evaluation Bilan »)"),H("p",{class:"m"},"Remplissez la situation d’évaluation : le PDF reprend l’en-tête, la situation, l’image, la consigne et la grille de correction (C1, C2, C3) avec les smileys."),
+  H("label",{},"Domaine"),dom,H("label",{},"Palier"),pal,ci2,dl2,fld("Classe (ex. 3, 4 et 5 ans)","cl"),fld("Titre de la situation","titre"),fld("Contexte (situation de départ)","ctx",1),fld("Consigne(s) : une consigne par ligne","cons",1),H("label",{},"Grille de correction"),gr));
+ r.append(imgsCard(EV,"Images de la situation",renderV));
+ r.append(H("div",{class:"row"},H("button",{class:"pri",onclick:()=>evalPdf(EV)},"Télécharger l’évaluation (PDF)"),H("button",{onclick:()=>{const a=ls.get("evals")||[];a.unshift({...JSON.parse(JSON.stringify(EV)),t:Date.now()});ls.set("evals",a.slice(0,30));renderV();note("Évaluation enregistrée.")}},"Enregistrer"),H("button",{class:"del",onclick:()=>{EV={dom:"",pal:"1",comp:"",cl:"",titre:"",ctx:"",cons:"",imgs:[],gr:"p1"};renderV()}},"Nouvelle")));
+ const a=ls.get("evals")||[],box=H("div",{class:"card"},H("b",{},"Mes évaluations enregistrées (sur cet appareil)"));
+ if(!a.length)box.append(H("p",{class:"m"},"Aucune évaluation enregistrée."));
+ a.forEach((x,i)=>box.append(H("div",{class:"it"},H("span",{},(x.titre||"Sans titre")+" · P"+x.pal),H("span",{class:"row",style:"margin:0"},H("button",{onclick:()=>{EV=JSON.parse(JSON.stringify(x));renderV();scrollTo(0,0)}},"Ouvrir"),H("button",{class:"del",onclick:()=>{a.splice(i,1);ls.set("evals",a);renderV()}},"✕")))));
+ r.append(box)}
+
+/* ----- Élèves : classe, liste nominative, effectifs, fréquentation ----- */
+function effs(){
+ const nm=C.eleves,g=f=>{const a=nm.filter(f);return[a.filter(n=>ci(n).s==="G").length,a.filter(n=>ci(n).s==="F").length,a.length]},
+  gab=n=>/^gabon/i.test(ci(n).nat||"");
+ return{ins:g(()=>1),anc:g(n=>ci(n).st==="R"),nou:g(n=>ci(n).st!=="R"),gab:g(gab),etr:g(n=>!gab(n)),orp:g(n=>ci(n).et==="Orphelin"),vul:g(n=>ci(n).et==="Vulnérable"),han:g(n=>ci(n).et==="Handicapé")}}
+function freq(m){
+ const days=Object.keys(C.pres||{}).filter(k=>k.startsWith(m)),n=C.eleves.length;if(!days.length||!n)return null;
+ const tot=days.reduce((s,k)=>s+(C.pres[k]||[]).filter(x=>C.eleves.includes(x)).length,0),t=Math.round(100*tot/(n*days.length));return{jours:days.length,taux:t,abs:100-t}}
+const MOISC=[["09","Septembre",2026],["10","Octobre",2026],["11","Novembre",2026],["12","Décembre",2026],["01","Janvier",2027],["02","Février",2027],["03","Mars",2027],["04","Avril",2027],["05","Mai",2027],["06","Juin",2027]];
+function effPdf(){
+ try{const d=pdfNew(false),e=effs();d.setFont("times","bold");d.setFontSize(13);d.text("TABLEAU D’EFFECTIFS",105,15,{align:"center"});d.setFontSize(10);d.setFont("times","normal");d.text(ecoleLine(),105,22,{align:"center"});
+  const row=(lab,a,sub)=>[sub?{content:lab,styles:{halign:"left"}}:"",...[0,1,2].map(i=>a[i])];
+  d.autoTable({startY:28,margin:{left:30,right:30},theme:"grid",styles:PS(10),headStyles:HS,
+   head:[[{content:"Rubriques",colSpan:2,rowSpan:2},{content:"Inscrits",rowSpan:1,colSpan:3}],["G","F","T"]].map((r,i)=>i?r:r),
+   body:[[{content:"Effectif",colSpan:2,styles:{halign:"left",fontStyle:"bold"}},...e.ins],
+    [{content:"Statut",rowSpan:2,styles:{fontStyle:"bold"}},"Anciens",...e.anc],["Nouveaux",...e.nou],
+    [{content:"Nationalité",rowSpan:2,styles:{fontStyle:"bold"}},"Gabonais",...e.gab],["Étrangers",...e.etr],
+    [{content:"État",rowSpan:3,styles:{fontStyle:"bold"}},"Orphelins",...e.orp],["Vulnérables",...e.vul],["Handicapés",...e.han]]});
+  d.setFontSize(8);d.text("Anciens : élèves redoublants ou déjà inscrits ; Nouveaux : nouveaux inscrits.",30,d.lastAutoTable.finalY+6);savePdf(d,"Tableau_effectifs.pdf")}
+ catch(err){note("Échec : "+((err&&err.message)||err))}}
+function listePdf(){
+ try{const d=pdfNew(false);d.setFont("times","bold");d.setFontSize(13);d.text("LISTE NOMINATIVE DES ÉLÈVES",105,15,{align:"center"});d.setFontSize(10);d.setFont("times","normal");d.text(ecoleLine(),105,22,{align:"center"});
+  d.autoTable({startY:28,margin:{left:10,right:10},theme:"grid",styles:PS(9,{halign:"left"}),headStyles:Object.assign({},HS,{halign:"center"}),
+   head:[["N°","Noms et Prénoms","Sexe","Date et lieu de naissance","Nationalité","Statut"]],
+   body:[...C.eleves].sort((a,b)=>a.localeCompare(b,"fr")).map((n,i)=>{const o=ci(n);return[i+1,n,o.s||"",[fdate(o.dn),o.ln].filter(Boolean).join(" à "),o.nat||"",o.st||""]}),
+   columnStyles:{0:{cellWidth:10,halign:"center"},2:{cellWidth:14,halign:"center"},5:{cellWidth:16,halign:"center"}}});
+  savePdf(d,"Liste_nominative.pdf")}catch(err){note("Échec : "+((err&&err.message)||err))}}
+function freqPdf(){
+ try{const d=pdfNew(true);d.setFont("times","bold");d.setFontSize(13);d.text("TABLEAU DE FRÉQUENTATION",148,15,{align:"center"});d.setFontSize(10);d.setFont("times","normal");d.text(ecoleLine(),148,22,{align:"center"});
+  const fr=MOISC.map(m=>freq(m[2]+"-"+m[0]));
+  d.autoTable({startY:30,margin:{left:10,right:10},theme:"grid",styles:PS(9),headStyles:HS,head:[["Mois",...MOISC.map(m=>m[1])]],
+   body:[["% de fréquentation",...fr.map(f=>f?f.taux+" %":"")],["% d’absence",...fr.map(f=>f?f.abs+" %":"")]]});
+  savePdf(d,"Tableau_frequentation.pdf")}catch(err){note("Échec : "+((err&&err.message)||err))}}
+function renderE(){
+ const r=$("#e");r.replaceChildren();
+ const sv=()=>{saveC()},f2=(lab,k,ph)=>{const i=h("input",{value:C[k]||"",placeholder:ph||""});i.oninput=()=>{C[k]=i.value;sv()};return H("div",{},h("label",{},lab),i)};
+ const lv=h("select",{},...LV.map(x=>h("option",{value:x.k,selected:x.k===(C.lv||"pp4")},x.l)));lv.onchange=()=>{C.lv=lv.value;sv();renderE()};
+ r.append(H("div",{class:"card"},H("b",{},"Ma classe"),H("label",{},"Niveau"),lv,f2("École","ecole","Nom de l’école"),f2("Année scolaire","annee","2026-2027"),f2("Lieu (pour « Fait à … »)","lieu","Oyem"),f2("Direction d’académie provinciale","dap","WOLEU-NTEM"),f2("Circonscription scolaire","circ","WOLEU-NTEM CENTRE")));
+ const e=effs(),sans=C.eleves.filter(n=>!ci(n).s).length;
+ r.append(H("div",{class:"card"},H("b",{},"Effectifs"),H("p",{},"Inscrits : "+e.ins[2]+" · Garçons : "+e.ins[0]+" · Filles : "+e.ins[1]),sans?H("p",{class:"m"},"⚠ "+sans+" élève(s) sans sexe renseigné."):null,
+  H("div",{class:"row"},H("button",{class:"pri",onclick:effPdf},"Tableau d’effectifs (PDF)"),H("button",{onclick:listePdf},"Liste nominative (PDF)"),H("button",{onclick:freqPdf},"Tableau de fréquentation (PDF)"))));
+ const fr=H("div",{class:"card"},H("b",{},"Fréquentation par mois"));
+ MOISC.forEach(m=>{const f=freq(m[2]+"-"+m[0]);if(f)fr.append(H("div",{class:"it"},H("span",{},m[1]+" "+m[2]),H("span",{},f.taux+" % présents · "+f.abs+" % absents ("+f.jours+" j)")))});
+ if(fr.children.length<2)fr.append(H("p",{class:"m"},"Faites l’appel dans « Gestion de classe » pour voir la fréquentation."));
+ r.append(fr);
+ const box=H("div",{class:"card"},H("b",{},"Élèves ("+C.eleves.length+")"),H("p",{class:"m"},"Ajoutez les élèves dans « Gestion de classe ». Complétez ici leurs informations (utilisées dans les PV, effectifs et rapports)."));
+ [...C.eleves].sort((a,b)=>a.localeCompare(b,"fr")).forEach(n=>{const o=ci(n);
+  const sel=(k,opts)=>{const s=h("select",{},...opts.map(x=>h("option",{value:x[0],selected:x[0]===(o[k]||"")},x[1])));s.onchange=()=>{o[k]=s.value;sv()};return s};
+  const inp=(k,t)=>{const i=h("input",{type:t||"text",value:o[k]||""});i.oninput=()=>{o[k]=i.value;sv()};return i};
+  box.append(H("details",{class:"it",style:"display:block"},H("summary",{style:"cursor:pointer;color:"+sexCol(n)+";font-weight:600"},n+(o.s?" ("+o.s+")":"")),
+   H("div",{class:"g"},H("div",{},h("label",{},"Sexe"),sel("s",[["","—"],["G","Garçon"],["F","Fille"]])),H("div",{},h("label",{},"Statut"),sel("st",[["N","Nouveau"],["R","Redoublant"]])),
+    H("div",{},h("label",{},"Date de naissance"),inp("dn","date")),H("div",{},h("label",{},"Lieu de naissance"),inp("ln")),
+    H("div",{},h("label",{},"Nationalité"),inp("nat")),H("div",{},h("label",{},"État"),sel("et",[["","Aucun"],["Orphelin","Orphelin"],["Vulnérable","Vulnérable"],["Handicapé","Handicapé"]])))))});
+ r.append(box)}
+
+/* ----- Résultats : relevé de notes, bulletin, rapport de palier, PV ----- */
+let NT=ls.get("notes")||{},NPP=ls.get("notespp")||{},RS={sub:"rel",pal:1,stu:""};
+const svN=()=>ls.set("notes",NT),svP=()=>ls.set("notespp",NPP);
+const MK=["E","M","F"],NC={E:3,M:2,F:2},MLB={E:"EDM / EAS (Éveil)",M:"Mathématiques",F:"Français"};
+const okm=m=>m==="Maxi"||m==="Mini";
+const nn=v=>v===null||v===undefined||v===""?null:+v;
+const sortedN=()=>[...C.eleves].sort((a,b)=>a.localeCompare(b,"fr"));
+function rec(p,n){NT[p]=NT[p]||{};const r=NT[p][n]||(NT[p][n]={abs:0});for(const k of MK)if(!Array.isArray(r[k])||r[k].length!==NC[k])r[k]=Array.from({length:NC[k]},()=>[null,null,null]);return r}
+function comp(c){const v=c.map(nn);if(v.every(x=>x===null))return{n:null,m:null};const n=v.reduce((s,x)=>s+(x||0),0);return{n,m:n>=8?"Maxi":n>=5?"Mini":n>=3?"Part":"NM"}}
+function calc(r){
+ const o={};let all=true;
+ for(const k of MK){const cs=r[k].map(comp),done=cs.every(c=>c.m!==null);let m=null;
+  if(done){const s=cs.filter(c=>okm(c.m)).length,t=NC[k];m=s===t?"Maxi":s===0?"NM":(s*2>=t?"Mini":"Part")}
+  o[k]={cs,m};if(!m)all=false}
+ o.pal=all?(x=>x===3?"Maxi":x===2?"Mini":x===1?"Part":"NM")(MK.filter(k=>okm(o[k].m)).length):null;return o}
+function passage(y,pr,pal,prof){
+ if(y===5)return{t:"CEP et orientation en 6e (selon le service des examens et concours)",ok:null};
+ if(pal.some(m=>!m))return{t:"Données incomplètes",ok:null};
+ const A=pal.every(okm),B=pal.filter(okm).length>=3;
+ if(pr){if(!prof)return{t:"Profil de sortie à saisir",ok:null};
+  const P=(okm(prof)&&(A||B))||(prof==="Part"&&pal[2]==="Part"&&okm(pal[3])&&okm(pal[4]));
+  return{t:P?"Passage en classe supérieure":"Décision du conseil de classe (reprise possible)",ok:P}}
+ const P=A||B||(pal[2]==="Part"&&okm(pal[3])&&okm(pal[4]));
+ return{t:P?"Passage en classe supérieure":"Décision du conseil de classe (reprise possible)",ok:P}}
+const palLbl=p=>p===6&&!isPP()?"Profil de sortie":"Palier "+p;
+function palSel(max){const s=h("select",{},...Array.from({length:max},(_,i)=>h("option",{value:String(i+1),selected:+RS.pal===i+1},i===5&&!isPP()?"Profil de sortie":"Palier "+(i+1))));s.onchange=()=>{RS.pal=+s.value;renderR()};return s}
+const gft=a=>[a.filter(n=>ci(n).s==="G").length,a.filter(n=>ci(n).s==="F").length,a.length];
+const pct=(a,b)=>b?Math.round(100*a/b):0;
+function sigBlock(d,y,land){const w=land?297:210;d.setFont("times","normal");d.setFontSize(9);d.text("Fait à "+(C.lieu||"……………………")+" le ……………………",w-12,y,{align:"right"});
+ d.text("L’Enseignant(e)",w*.2,y+8,{align:"center"});d.text("Le (la) Directeur (trice)",w*.75,y+8,{align:"center"});d.text("…………………………………",w*.2,y+22,{align:"center"});d.text("…………………………………",w*.75,y+22,{align:"center"})}
+
+/* relevé de notes (primaire) */
+function relPdf(p){
+ try{const d=pdfNew(true);d.setFont("times","bold");d.setFontSize(12);d.text("Relevé de notes",148,10,{align:"center"});d.setFontSize(8);d.setFont("times","normal");
+  d.text(ecoleLine()+"     "+palLbl(p),148,15,{align:"center"});
+  const comps=[];const h1=[{content:"N°",rowSpan:3},{content:"Noms et Prénoms",rowSpan:3}],h2=[],h3=[];
+  MK.forEach(k=>{h1.push({content:MLB[k],colSpan:NC[k]*5+1});for(let i=0;i<NC[k];i++){h2.push({content:"Compétence "+(i+1),colSpan:5});["C1","C2","C3","Note","Appr."].forEach(x=>h3.push(x))}h2.push({content:"Maîtrise "+(k==="E"?"EDM/EAS":k==="M"?"Maths":"Français"),rowSpan:2})});
+  h1.push({content:"Niveau de maîtrise du palier",rowSpan:3});
+  const body=sortedN().map((n,i)=>{const R=rec(p,n),c=calc(R);if(R.abs){return[i+1,{content:n,styles:{halign:"left"}},{content:"Absent",colSpan:MK.reduce((s,k)=>s+NC[k]*5+1,0)},""]}
+   const row=[i+1,{content:n,styles:{halign:"left"}}];MK.forEach(k=>{R[k].forEach((cc,ci2)=>{cc.forEach(v=>row.push(v===null?"":v));const x=c[k].cs[ci2];row.push(x.n===null?"":x.n,x.m||"")});row.push(c[k].m||"")});row.push(c.pal||"");return row});
+  d.autoTable({startY:18,margin:{left:6,right:6},theme:"grid",styles:PS(5.2,{cellPadding:.5}),headStyles:Object.assign({},HS,{fontSize:5.2}),head:[h1,h2,h3],body,columnStyles:{0:{cellWidth:5},1:{cellWidth:34,halign:"left"}}});
+  sigBlock(d,Math.min(d.lastAutoTable.finalY+8,190),true);savePdf(d,"Releve_notes_"+palLbl(p).replace(/\s/g,"_")+".pdf")}
+ catch(e){note("Échec : "+((e&&e.message)||e))}}
+function relPR(r){
+ const mx=lvi().pr?6:5;if(RS.pal>mx)RS.pal=1;const p=RS.pal;
+ r.append(H("div",{class:"card"},H("b",{},"Relevé de notes"),H("p",{class:"m"},"Saisissez les points de chaque critère (0 à 3) pour chaque compétence, d’après la grille de correction (C1, C2, C3). Notes et maîtrises se calculent automatiquement."),H("label",{},"Palier"),palSel(mx),H("div",{class:"row"},H("button",{class:"pri",onclick:()=>relPdf(p)},"Télécharger le relevé (PDF)"))));
+ sortedN().forEach(n=>{const R=rec(p,n),outs={},mats={};
+  const sum=H("summary",{style:"cursor:pointer;font-weight:600;color:"+sexCol(n)},n),palOut=H("p",{style:"font-weight:700"},"");
+  const upd=()=>{const c=calc(R);for(const k of MK){c[k].cs.forEach((x,i)=>{outs[k][i].textContent=x.m?"Note "+x.n+" — "+x.m:""});mats[k].textContent=c[k].m?"Maîtrise "+MLB[k]+" : "+c[k].m:""}
+   palOut.textContent="Maîtrise du palier : "+(c.pal||"—");sum.textContent=n+(R.abs?" — Absent":c.pal?" — "+c.pal:"")};
+  const ab=h("input",{type:"checkbox",checked:!!R.abs,style:"width:auto"});ab.onchange=()=>{R.abs=ab.checked?1:0;svN();upd()};
+  const body=H("div",{},H("label",{style:"display:flex;gap:8px;align-items:center;color:var(--t);font-size:14px"},ab,"Absent à l’évaluation"));
+  MK.forEach(k=>{outs[k]=[];body.append(H("b",{style:"display:block;margin-top:10px"},MLB[k]));
+   R[k].forEach((cc,i)=>{const out=H("span",{class:"m"},"");outs[k].push(out);
+    const ins=[0,1,2].map(j=>{const inp=h("input",{type:"number",min:"0",max:"3",step:"1",inputMode:"numeric",value:cc[j]===null?"":String(cc[j]),style:"width:54px;display:inline-block;padding:6px"});
+     inp.oninput=()=>{if(inp.value===""){cc[j]=null}else{const v=Math.max(0,Math.min(3,Math.round(+inp.value)||0));cc[j]=v;if(String(v)!==inp.value)inp.value=String(v)}svN();upd()};return inp});
+    body.append(H("div",{class:"row",style:"align-items:center;margin-top:6px"},H("span",{style:"min-width:96px"},"Compétence "+(i+1)),...ins.map((x,j)=>[H("span",{class:"m"},"C"+(j+1)),x]),out))});
+   const mo=H("p",{class:"m"},"");mats[k]=mo;body.append(mo)});
+  body.append(palOut);upd();r.append(H("details",{class:"card"},sum,body))})}
+/* relevé bilan (pré-primaire) */
+const PPD=["Mathématiques","Communication/Expression","Éveil"],SMO=[["","—"],["0","😊 Acquis"],["1","😐 En cours"],["2","☹ Non acquis"]];
+function relPPpdf(p){
+ try{const d=pdfNew(false);d.setFont("times","bold");d.setFontSize(13);d.text("RELEVÉ DES ÉVALUATIONS BILAN – PALIER "+p,105,13,{align:"center"});d.setFontSize(9);d.setFont("times","normal");d.text(ecoleLine(),105,19,{align:"center"});
+  const rows=sortedN().map((n,i)=>{const o=(NPP[p]||{})[n]||{};return[i+1,{content:n,styles:{halign:"left"}},ci(n).s||"",...PPD.map((_,k)=>o[k]===undefined||o[k]===""?"":"S"+o[k])]});
+  const cnt=PPD.map((_,k)=>{const a=sortedN().map(n=>((NPP[p]||{})[n]||{})[k]);return[a.filter(x=>x==="0").length,a.filter(x=>x==="1").length,a.filter(x=>x==="2").length]});
+  d.autoTable({startY:24,margin:{left:10,right:10},theme:"grid",styles:PS(9,{minCellHeight:7}),headStyles:HS,head:[["N°","Noms et Prénoms","Sexe",...PPD]],body:rows,columnStyles:{1:{cellWidth:60,halign:"left"}},
+   didDrawCell:x=>{if(x.section==="body"&&x.column.index>=3&&/^S[012]$/.test(String(x.cell.raw)))face(d,x.cell.x+x.cell.width/2,x.cell.y+x.cell.height/2,2.6,+String(x.cell.raw)[1])},
+   didParseCell:x=>{if(x.section==="body"&&x.column.index>=3&&/^S[012]$/.test(String(x.cell.raw)))x.cell.text=[""]}});
+  const y=d.lastAutoTable.finalY+6;d.setFontSize(9);PPD.forEach((t,k)=>d.text(t+" : "+cnt[k][0]+" acquis · "+cnt[k][1]+" en cours · "+cnt[k][2]+" non acquis",12,y+k*5));
+  sigBlock(d,Math.min(y+24,270),false);savePdf(d,"Releve_bilan_palier_"+p+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
+function relPP(r){
+ const p=RS.pal>6?1:RS.pal;RS.pal=p;NPP[p]=NPP[p]||{};
+ r.append(H("div",{class:"card"},H("b",{},"Relevé des évaluations bilan"),H("p",{class:"m"},"Pour chaque élève, indiquez le résultat de chaque domaine avec les smileys de la grille : 😊 acquis, 😐 en cours, ☹ non acquis."),H("label",{},"Palier"),palSel(6),H("div",{class:"row"},H("button",{class:"pri",onclick:()=>relPPpdf(p)},"Télécharger le relevé (PDF)"))));
+ sortedN().forEach(n=>{const o=NPP[p][n]||(NPP[p][n]={});
+  const sels=PPD.map((t,k)=>{const s=h("select",{},...SMO.map(x=>h("option",{value:x[0],selected:x[0]===(o[k]||"")},x[1])));s.onchange=()=>{o[k]=s.value;svP()};return H("div",{},h("label",{},t),s)});
+  r.append(H("details",{class:"card"},H("summary",{style:"cursor:pointer;font-weight:600;color:"+sexCol(n)},n),H("div",{class:"g"},...sels)))})}
+/* bulletin */
+function bulPdf(names){
+ try{const d=pdfNew(true),pr=!!lvi().pr,np=pr?6:5,ord=["E","F","M"];
+  names.forEach((n,idx)=>{if(idx)d.addPage();const o=ci(n);
+   d.setFont("times","bold");d.setFontSize(11);d.text("BULLETIN D’EVALUATION DES ACQUIS SCOLAIRES",148,9,{align:"center"});d.setFont("times","normal");d.setFontSize(8);
+   d.text(ecoleLine(),148,13.5,{align:"center"});d.text("Élève : "+n+(o.dn?"   Né(e) le "+fdate(o.dn):"")+(o.ln?" à "+o.ln:"")+"   Sexe : "+(o.s||"…"),148,17.5,{align:"center"});
+   const cs=[];ord.forEach(k=>{for(let i=0;i<NC[k];i++)cs.push([k,i])});
+   const head=[[{content:"Paliers",rowSpan:3},{content:"",rowSpan:3},{content:"EDM & EAS",colSpan:9},{content:"Français",colSpan:6},{content:"Mathématiques",colSpan:6}],
+    [...cs.map(c=>({content:"Compétence "+(c[1]+1),colSpan:3}))],[...cs.flatMap(()=>["C1","C2","C3"])]];
+   const body=[],pals=[];
+   for(let p=1;p<=np;p++){const R=rec(p,n),c=calc(R);pals.push(c.pal);const lab=palLbl(p);
+    body.push([{content:lab,rowSpan:4,styles:{fontStyle:"bold"}},{content:"Nombre de points du critère",styles:{halign:"left"}},...cs.flatMap(x=>R[x[0]][x[1]].map(v=>v===null?"":v))]);
+    body.push([{content:"Note – Maîtrise",styles:{halign:"left"}},...cs.map(x=>{const q=c[x[0]].cs[x[1]];return{content:q.m?q.n+" – "+q.m:"",colSpan:3}})]);
+    body.push([{content:"Maîtrise de la matière",styles:{halign:"left"}},...ord.map(k=>({content:c[k].m||"",colSpan:NC[k]*3}))]);
+    body.push([{content:p===6?"Maîtrise du profil":"Maîtrise du palier",styles:{halign:"left"}},{content:c.pal||"",colSpan:21}])}
+   d.autoTable({startY:20,margin:{left:6,right:6},theme:"grid",styles:PS(5.6,{cellPadding:.5}),headStyles:Object.assign({},HS,{fontSize:6}),head,body,columnStyles:{0:{cellWidth:14},1:{cellWidth:34}}});
+   const dec=passage(lvi().y,pr,pals.slice(0,5),pr?pals[5]:null),y=d.lastAutoTable.finalY+3;
+   d.autoTable({startY:y,margin:{left:6,right:6},theme:"grid",styles:PS(7,{cellPadding:1}),headStyles:HS,
+    head:[["Paliers","Palier 1","Palier 2","Palier 3","Palier 4","Palier 5",{content:"Décision du conseil de classe en fin d’année",styles:{cellWidth:78}}]],
+    body:[[{content:"Indicateurs de décision",styles:{halign:"left"}},...pals.slice(0,5).map(x=>x||""),{content:(o.dec?o.dec+"\n":"")+"Indicateur : "+dec.t,styles:{halign:"left",fontSize:6.5}}]]});
+   d.autoTable({startY:d.lastAutoTable.finalY+3,margin:{left:6,right:6},theme:"grid",styles:PS(7,{minCellHeight:16,valign:"top"}),head:[],body:[["Visa du Directeur (trice)","Signature de l’enseignant (e)","Signature du (de la) Directeur (trice)","Signature du (de la) parent (e)"]]})});
+  savePdf(d,names.length>1?"Bulletins_classe.pdf":"Bulletin_"+names[0].replace(/[^\wÀ-ÿ]+/g,"_")+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
+function bulUI(r){
+ const names=sortedN();if(!names.includes(RS.stu))RS.stu=names[0];
+ const s=h("select",{},...names.map(n=>h("option",{value:n,selected:n===RS.stu},n)));s.onchange=()=>{RS.stu=s.value;renderR()};
+ const pr=!!lvi().pr,np=pr?6:5,pals=Array.from({length:np},(_,i)=>calc(rec(i+1,RS.stu)).pal),dec=passage(lvi().y,pr,pals.slice(0,5),pr?pals[5]:null);
+ const o=ci(RS.stu),ds=h("select",{},...[["","— à décider —"],["Orienté(e) en classe supérieure","Orienté(e) en classe supérieure"],["Orienté(e) dans la même classe","Orienté(e) dans la même classe"],["Abandon","Abandon"]].map(x=>h("option",{value:x[0],selected:x[0]===(o.dec||"")},x[1])));
+ ds.onchange=()=>{o.dec=ds.value;saveC()};
+ r.append(H("div",{class:"card"},H("b",{},"Bulletin d’évaluation des acquis scolaires"),H("label",{},"Élève"),s,
+  ...pals.map((m,i)=>H("p",{},palLbl(i+1)+" : "+(m||"—"))),H("p",{style:"font-weight:700"},"Indicateur : "+dec.t),H("p",{class:"m"},"Indicateur calculé d’après les conditions de passage fournies : à valider par le conseil de classe."),
+  H("label",{},"Décision du conseil de classe"),ds,
+  H("div",{class:"row"},H("button",{class:"pri",onclick:()=>bulPdf([RS.stu])},"Bulletin de l’élève (PDF)"),H("button",{onclick:()=>bulPdf(names)},"Tous les bulletins (PDF)"))))}
+/* rapport d’intégration du palier et tableau des résultats */
+function rapData(p){
+ const names=C.eleves,ev=names.filter(n=>!rec(p,n).abs),ab=names.filter(n=>rec(p,n).abs),cal={};ev.forEach(n=>cal[n]=calc(rec(p,n)));
+ const m={};for(const k of MK){const g=x=>ev.filter(n=>cal[n][k].m===x);m[k]={maxi:gft(g("Maxi")),mini:gft(g("Mini")),part:gft(g("Part")),nm:gft(g("NM"))}}
+ const pal={ok:gft(ev.filter(n=>okm(cal[n].pal))),ko:gft(ev.filter(n=>cal[n].pal&&!okm(cal[n].pal)))};
+ return{ins:gft(names),abs:gft(ab),ev:gft(ev),m,pal,inc:ev.filter(n=>!cal[n].pal).length}}
+function rapPdf(p){
+ try{const d=pdfNew(true),R=rapData(p);d.setFont("times","bold");d.setFontSize(12);d.text("Rapport d’intégration du palier",148,10,{align:"center"});d.setFont("times","normal");d.setFontSize(8);d.text(ecoleLine()+"     "+palLbl(p),148,15,{align:"center"});
+  const gf=["G","F","T"];
+  const h1=[{content:"N°",rowSpan:3},{content:"Niveau",rowSpan:3},{content:"Élèves inscrits",colSpan:3,rowSpan:2},{content:"Élèves absents",colSpan:3,rowSpan:2},{content:"Élèves évalués",colSpan:3,rowSpan:2},{content:"Situation de réussite par matière",colSpan:10},{content:"Réussite dans le palier",colSpan:4,rowSpan:2},{content:"Situation d’échec par matière",colSpan:10},{content:"Échec dans le palier",colSpan:4,rowSpan:2}];
+  const h2=[{content:"Maximale",colSpan:3},{content:"Minimale",colSpan:3},{content:"Total réussite",colSpan:4},{content:"Partielle",colSpan:3},{content:"Non maîtrise",colSpan:3},{content:"Total échec",colSpan:4}];
+  const h3=[...gf,...gf,...gf,...gf,...gf,...gf,"%",...gf,"%",...gf,...gf,...gf,"%",...gf,"%"];
+  const body=MK.map((k,i)=>{const m=R.m[k],tr=[0,1,2].map(j=>m.maxi[j]+m.mini[j]),te=[0,1,2].map(j=>m.part[j]+m.nm[j]);
+   const row=[i+1,{content:MLB[k],styles:{halign:"left"}},...R.ins,...R.abs,...R.ev,...m.maxi,...m.mini,...tr,pct(tr[2],R.ev[2])];
+   if(!i)row.push(...R.pal.ok.map(x=>({content:x,rowSpan:3})),{content:pct(R.pal.ok[2],R.ev[2]),rowSpan:3});
+   row.push(...m.part,...m.nm,...te,pct(te[2],R.ev[2]));
+   if(!i)row.push(...R.pal.ko.map(x=>({content:x,rowSpan:3})),{content:pct(R.pal.ko[2],R.ev[2]),rowSpan:3});return row});
+  d.autoTable({startY:19,margin:{left:5,right:5},theme:"grid",styles:PS(5.6,{cellPadding:.6}),headStyles:Object.assign({},HS,{fontSize:5.8}),head:[h1,h2,h3],body,columnStyles:{1:{cellWidth:22,halign:"left"}}});
+  const y=d.lastAutoTable.finalY+4;d.setFontSize(7.5);d.text("Pourcentage = (total / total évalués) × 100, arrondi à l’unité. Réussite = maîtrise maximale + minimale ; échec = maîtrise partielle + non maîtrise.",6,y);
+  if(R.inc)d.text("Attention : "+R.inc+" élève(s) évalué(s) sans notes complètes ne sont pas comptés dans les maîtrises.",6,y+4);
+  sigBlock(d,Math.min(y+12,190),true);savePdf(d,"Rapport_integration_"+palLbl(p).replace(/\s/g,"_")+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
+function resPdf(){
+ try{const d=pdfNew(true);d.setFont("times","bold");d.setFontSize(12);d.text("TABLEAU DES RÉSULTATS SCOLAIRES",148,10,{align:"center"});d.setFont("times","normal");d.setFontSize(8);d.text(ecoleLine(),148,15,{align:"center"});
+  const gf=["G","F","T"],rows=[];
+  for(let p=1;p<=5;p++){const R=rapData(p),ok=R.pal.ok,ko=R.pal.ko,ev=R.ev;rows.push(["Palier "+p,...R.ins,...R.abs,...ev,...ok,...ko,...[0,1,2].map(j=>pct(ok[j],ev[j])),...[0,1,2].map(j=>pct(ko[j],ev[j]))])}
+  d.autoTable({startY:19,margin:{left:6,right:6},theme:"grid",styles:PS(7),headStyles:HS,head:[["Paliers",{content:"Inscrits",colSpan:3},{content:"Absents",colSpan:3},{content:"Présents",colSpan:3},{content:"Nbre de réussite",colSpan:3},{content:"Nbre d’échec",colSpan:3},{content:"% réussite",colSpan:3},{content:"% d’échec",colSpan:3}],["",...gf,...gf,...gf,...gf,...gf,...gf,...gf]],body:rows});
+  sigBlock(d,Math.min(d.lastAutoTable.finalY+8,190),true);savePdf(d,"Tableau_resultats_scolaires.pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
+function rapUI(r){
+ const p=RS.pal>5?1:RS.pal;RS.pal=p;const R=rapData(p);
+ const line=(t,a)=>H("p",{},t+" : "+a[0]+" G · "+a[1]+" F · "+a[2]+" total");
+ r.append(H("div",{class:"card"},H("b",{},"Rapport d’intégration du palier"),H("label",{},"Palier"),palSel(5),line("Inscrits",R.ins),line("Absents",R.abs),line("Évalués",R.ev),
+  H("p",{style:"font-weight:700"},"Réussite dans le palier : "+R.pal.ok[2]+" ("+pct(R.pal.ok[2],R.ev[2])+" %) · Échec : "+R.pal.ko[2]+" ("+pct(R.pal.ko[2],R.ev[2])+" %)"),R.inc?H("p",{class:"m"},"⚠ "+R.inc+" élève(s) sans notes complètes."):null,
+  H("div",{class:"row"},H("button",{class:"pri",onclick:()=>rapPdf(p)},"Rapport d’intégration (PDF)"),H("button",{onclick:resPdf},"Tableau des résultats scolaires (PDF)"))))}
+/* procès-verbal de fin d’année */
+function pvDefault(n){
+ if(isPP())return"Orienté(e) en section supérieure";
+ const pr=!!lvi().pr,np=pr?6:5,pals=Array.from({length:np},(_,i)=>calc(rec(i+1,n)).pal),d=passage(lvi().y,pr,pals.slice(0,5),pr?pals[5]:null);
+ return d.ok===true?"Orienté(e) en classe supérieure":d.ok===false?"Orienté(e) dans la même classe":""}
+function pvPdf(){
+ try{const pp=isPP(),d=pdfNew(!pp),W=pp?210:297,yr=C.annee||"2026-2027";let y=ministHead(d,0,10,W/2+30);
+  d.setFont("times","bold");d.setFontSize(9);d.text("Ordre d’enseignement : "+(pp?"PRE PRIMAIRE":"PRIMAIRE"),10,y+3);d.text("Ecole : "+(C.ecole||"…………………………………"),10,y+8);
+  d.setFontSize(11);d.text("PROCES VERBAL DE FIN D’ANNEE SCOLAIRE DU "+(pp?"PRE PRIMAIRE ":"PRIMAIRE ")+yr,W/2,y+17,{align:"center"});
+  d.setFontSize(9);d.text((pp?"SECTION : ":"CLASSE : ")+(C.nom||lvi().l),10,y+23);
+  const names=sortedN(),pr=!!lvi().pr,np=pr?6:5;
+  const decs=n=>ci(n).dec||pvDefault(n);
+  const body=names.map((n,i)=>{const o=ci(n),b=[i+1,{content:n,styles:{halign:"left"}},[fdate(o.dn),o.ln].filter(Boolean).join(" à "),o.s||"",o.nat||""];
+   if(!pp){b.push(o.st||"");for(let p=1;p<=np;p++)b.push(calc(rec(p,n)).pal||"");if(!pr)b.push("")}b.push({content:decs(n),styles:{halign:"left"}});return b});
+  const head=pp?[["N°","Noms et Prénoms de l’élève","Date et lieu de naissance","Sexe","Nationalité","Décisions du conseil de classe*"]]:
+   [[{content:"N°",rowSpan:2},{content:"Noms et Prénoms de l’élève",rowSpan:2},{content:"Date et lieu de naissance",rowSpan:2},{content:"Sexe",rowSpan:2},{content:"Nationalité",rowSpan:2},{content:"Statut",rowSpan:2},{content:"Niveau de maîtrise du",colSpan:6},{content:"Décisions du conseil de classe*",rowSpan:2}],["1er Palier","2e Palier","3e Palier","4e Palier","5e Palier","Profil de sortie"]];
+  d.autoTable({startY:y+26,margin:{left:10,right:10},theme:"grid",styles:PS(pp?8.5:7,{cellPadding:1.2}),headStyles:HS,head,body,columnStyles:{0:{cellWidth:8},1:{halign:"left"}}});
+  y=d.lastAutoTable.finalY+5;d.setFont("times","normal");d.setFontSize(8);
+  d.text(pp?"*Décisions du conseil de classe : Orienté (e) en section supérieure (préciser) / Abandon":"NB : *Statut (N : Nouveau / R : Redoublant) *Décisions du conseil de classe : Orienté (e) en classe supérieure (préciser) / Orienté (e) dans la même classe (préciser) / Abandon",10,y);
+  y+=8;if(y>(pp?255:175)){d.addPage();y=20}
+  d.setFontSize(9);d.text("Fait à "+(C.lieu||"Oyem")+", le ………………………",W-12,y,{align:"right"});d.setFont("times","bold");d.text("Visa du Chef d’établissement",20,y+8);d.text("Visa de l’Enseignant (e)",W-70,y+8);
+  d.setFont("times","normal");d.text("________________________",20,y+22);d.text("________________________",W-70,y+22);
+  savePdf(d,"PV_fin_annee_"+(pp?"pre_primaire":"primaire")+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
+function pvUI(r){
+ const opts=isPP()?["","Orienté(e) en section supérieure","Abandon"]:["","Orienté(e) en classe supérieure","Orienté(e) dans la même classe","Abandon"];
+ r.append(H("div",{class:"card"},H("b",{},"Procès-verbal de fin d’année scolaire"),H("p",{class:"m"},"Le PV reprend les informations de l’onglet « Élèves » et, pour le primaire, les niveaux de maîtrise des paliers. Choisissez la décision du conseil de classe pour chaque élève (sinon la proposition automatique est utilisée)."),
+  H("div",{class:"row"},H("button",{class:"pri",onclick:pvPdf},"Télécharger le PV (PDF)"))));
+ sortedN().forEach(n=>{const o=ci(n),s=h("select",{},...opts.map(x=>h("option",{value:x,selected:x===(o.dec||"")},x||"— proposition automatique : "+(pvDefault(n)||"à décider"))));s.onchange=()=>{o.dec=s.value;saveC()};
+  r.append(H("div",{class:"card"},H("b",{style:"color:"+sexCol(n)},n),s))})}
+function renderR(){
+ const r=$("#r");r.replaceChildren();
+ const tabs=isPP()?[["rel","Relevé bilan"],["pv","PV"]]:[["rel","Relevé de notes"],["bul","Bulletin"],["rap","Rapport de palier"],["pv","PV"]];
+ if(!tabs.some(t=>t[0]===RS.sub))RS.sub=tabs[0][0];
+ r.append(H("div",{class:"row"},...tabs.map(t=>H("button",{class:t[0]===RS.sub?"pri":"",onclick:()=>{RS.sub=t[0];renderR()}},t[1]))));
+ if(!C.eleves.length){r.append(H("div",{class:"card"},"Ajoutez d’abord vos élèves dans « Gestion de classe », puis complétez leurs informations dans « Élèves »."));return}
+ ({rel:isPP()?relPP:relPR,bul:bulUI,rap:rapUI,pv:pvUI})[RS.sub](r)}
+
+/* ----- Planification (documents 004 et 005 / 2026-2027) ----- */
+const PLN={
+ pr:{t:"PLANIFICATION DES SEMAINES D’APPRENTISSAGES ET D’INTEGRATIONS (PRIMAIRE)",c:["Palier I","Palier II","Palier III","Palier IV","Palier V","Profil de sortie"],
+  r:[["1ère Semaine Apprentissage","0914-0918","1026-1030","1221-1223","0208-0212","0330-0402",""],["2e Semaine Apprentissage","0921-0925","1102-1106","0104-0108","0215-0219","0405-0409",""],
+  ["3e Semaine Apprentissage","0928-1002","1109-1113","0111-0115","0222-0226","0412-0416",""],["4e Semaine Apprentissage","1005-1009","1116-1120","0118-0122","0301-0305","0419-0423",""],
+  ["5e Semaine Apprentissage","1012-1016","1207-1211","0125-0128","0315-0319","0426-0430",""],["Intégration","1019-1023","1214-1218","0201-0205","0321-0326","0503-0507","0510-0514"]],
+  n:"La période du mardi 1er au vendredi 11 septembre 2026 est réservée aux évaluations diagnostiques. La période du lundi 17 au vendredi 4 juin est réservée aux activités de renforcement et de fin d’année scolaire."},
+ pp:{t:"PLANIFICATION DES SEMAINES D’APPRENTISSAGES ET D’INTEGRATIONS (PRE-PRIMAIRE)",c:["Palier I","Palier II","Palier III","Palier IV","Palier V","Palier VI"],
+  r:[["1ère Semaine Apprentissage","0914-0918","1019-1023","1207-1211","0118-0122","0222-0226","0405-0409"],["2e Semaine Apprentissage","0921-0925","1026-1030","1214-1218","0125-0128","0301-0305","0412-0416"],
+  ["3e Semaine Apprentissage","0928-1002","1102-1106","1221-1223","0201-0205","0315-0319","0419-0423"],["4e Semaine Apprentissage","1005-1009","1109-1113","0104-0108","0208-0212","0321-0326","0426-0430"],
+  ["Semaine bilan","1012-1016","1116-1120","0111-0115","0215-0219","0330-0402","0503-0507"]],
+  n:"La période du mardi 1er au vendredi 11 septembre 2026 est réservée aux évaluations diagnostiques. La période du lundi 10 au vendredi 4 juin est réservée aux activités de renforcement et de fin d’année scolaire."}};
+const MCOURT=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+function rg(s){const[a,b]=s.split("-"),f=x=>{const m=+x.slice(0,2),dd=+x.slice(2);return new Date(m>=8?2026:2027,m-1,dd)};return[f(a),f(b)]}
+function rgl(s){const[a,b]=rg(s);return a.getDate()+(a.getMonth()!==b.getMonth()?" "+MCOURT[a.getMonth()]:"")+"–"+b.getDate()+" "+MCOURT[b.getMonth()]+" "+b.getFullYear()}
+function planNow(P){const t=new Date();t.setHours(12,0,0,0);
+ for(const row of P.r)for(let j=1;j<row.length;j++){if(!row[j])continue;const[a,b]=rg(row[j]);b.setHours(23,59,59,0);if(t>=a&&t<=b)return{row:row[0],col:P.c[j-1],i:P.r.indexOf(row),j}}return null}
+function renderL(){
+ const r=$("#l");r.replaceChildren();const P=isPP()?PLN.pp:PLN.pr,now=planNow(P);
+ r.append(H("div",{class:"card"},H("b",{},"📅 Planification 2026-2027"),
+  H("p",{style:"font-weight:700"},now?"Aujourd’hui : "+now.col+" – "+now.row:"Aujourd’hui : hors semaine planifiée (évaluations diagnostiques, renforcement, vacances ou fin d’année)."),H("p",{class:"m"},P.t)));
+ const tb=H("table",{style:"border-collapse:collapse;width:100%;font-size:12px"}),th=(t,x)=>H("th",{style:"border:1px solid var(--b);padding:6px;background:var(--bg);"+(x||"")},t);
+ tb.append(H("tr",{},th("Semaines"),...P.c.map(c=>th(c))));
+ P.r.forEach((row,i)=>tb.append(H("tr",{},H("td",{style:"border:1px solid var(--b);padding:6px;font-weight:700"},row[0]),...row.slice(1).map((c,j)=>H("td",{style:"border:1px solid var(--b);padding:6px;text-align:center;"+(now&&now.i===i&&now.j===j+1?"background:#fcd116;color:#000;font-weight:700":"")},c?rgl(c):"")))));
+ r.append(H("div",{class:"card",style:"overflow-x:auto"},tb),H("div",{class:"card"},H("p",{class:"m"},"NB : "+P.n)))}
+
+/* ----- Documents obligatoires ----- */
+const DOCL=[
+ {g:"Conseil de classe",t:"Procès-verbal de fin d’année scolaire (pré-primaire et primaire) 2025-2026",f:"doc-pv-conseil-de-classe.docx"},
+ {g:"Évaluation",t:"Conditions de passage en classe supérieure",f:"doc-conditions-de-passage.pdf"},
+ {g:"Évaluation",t:"Conditions de remplissage de la grille de correction et de réussite",f:"doc-remplissage-grille-correction.pdf"},
+ {g:"Évaluation",t:"Remplissage du bulletin de notes du primaire",f:"doc-remplissage-bulletin-primaire.pdf"},
+ {g:"Évaluation",t:"Remplissage du rapport de palier (relevé de notes, rapport d’intégration)",f:"doc-remplissage-rapport-palier.pdf"},
+ {g:"Évaluations bilan (pré-primaire, palier 1)",t:"Mathématiques – Palier 1",f:"doc-evaluation-bilan-maths-palier1.pdf"},
+ {g:"Évaluations bilan (pré-primaire, palier 1)",t:"Communication / Expression – Palier 1",f:"doc-evaluation-bilan-francais-palier1.pdf"},
+ {g:"Évaluations bilan (pré-primaire, palier 1)",t:"Éveil – Palier 1",f:"doc-evaluation-bilan-eveil-palier1.pdf"},
+ {g:"Planification",t:"Planification des semaines d’apprentissages et d’intégrations 2026-2027",f:"doc-planification-2026-2027.pdf"},
+ {g:"Tenue de classe",t:"Module d’accompagnement : tenue d’une classe primaire 2026-2027",f:"doc-module-tenue-de-classe-2026-2027.docx"},
+ {g:"Curricula",t:"Curriculum de mathématiques – 1ère année",f:"doc-curriculum-maths-1re-annee.pdf"},
+ {g:"Curricula",t:"Curriculum de français – 1ère année",f:"doc-curriculum-francais-1re-annee.pdf"},
+ {g:"Curricula",t:"Curriculum d’EDM – 1ère année",f:"doc-curriculum-edm-1re-annee.pdf"},
+ {g:"Curricula",t:"Curriculum de mathématiques – 3e année",f:"doc-curriculum-maths-3e-annee.pdf"},
+ {g:"Curricula",t:"Curriculum de français – 3e année",f:"doc-curriculum-francais-3e-annee.pdf"},
+ {g:"Curricula",t:"Curriculum d’EDM – 3e année",f:"doc-curriculum-edm-3e-annee.pdf"}];
+async function getDoc(x){
+ try{const r=await fetch(x.f,{method:"HEAD",cache:"no-store"});if(!r.ok)throw 0}catch(e){note("Document non disponible pour le moment : l’administrateur doit l’ajouter.");return}
+ const a=h("a",{href:x.f,download:x.f});document.body.append(a);a.click();a.remove()}
+function renderD(){
+ const r=$("#d");r.replaceChildren();const gs=[...new Set(DOCL.map(x=>x.g))];
+ r.append(H("div",{class:"card"},H("b",{},"📁 Documents obligatoires"),H("p",{class:"m"},"Touchez « Télécharger » pour enregistrer le document sur votre téléphone.")));
+ gs.forEach(g=>{const box=H("div",{class:"card"},H("b",{},g));DOCL.filter(x=>x.g===g).forEach(x=>box.append(H("div",{class:"it"},H("span",{},x.t,H("br"),H("span",{class:"m"},x.f.split(".").pop().toUpperCase())),H("button",{class:"pri",onclick:()=>getDoc(x)},"Télécharger"))));r.append(box)})}
+
+/* ----- Administration : blocage en direct et suppression ----- */
+let BLK={},CID="";
+async function ensureAdm(){if(!AUTH||!AUTH.adm)await fbAuth("adm",{email:FB.admin,password:ls.get("admpw")||""})}
+async function delTeacher(uid,cid){
+ await ensureAdm();if(cid)await fb("PUT","blocked/"+cid,true);
+ for(const p of["reports","inbox","req","readyMeta","readyFile"])await fb("DELETE",p+"/"+uid);
+ const q=await fb("GET","queue")||{};for(const k of Object.keys(q))if(k.indexOf(uid+"_")===0)await fb("DELETE","queue/"+k);
+ if(cid){const reg=(ls.get("reg")||[]).filter(x=>x.i!==cid);ls.set("reg",reg)}}
+function confirmBtn(label,cls,fn){let armed=0,tm=0;const b=H("button",{class:cls||"del"},label);
+ b.onclick=async()=>{if(!armed){armed=1;b.textContent="Confirmer ?";clearTimeout(tm);tm=setTimeout(()=>{armed=0;b.textContent=label},4000);return}
+  clearTimeout(tm);b.disabled=true;try{await fn()}catch(e){note("Échec : "+((e&&e.message)||e));b.disabled=false;armed=0;b.textContent=label}};return b}
+function admBtns(id,d,reload){
+ if(!d.cid)return[H("span",{class:"m"},"ancien code")];
+ const bl=!!(BLK&&BLK[d.cid]);
+ return[H("button",{class:bl?"":"del",onclick:async()=>{try{await ensureAdm();if(bl)await fb("DELETE","blocked/"+d.cid);else await fb("PUT","blocked/"+d.cid,true);reload()}catch(e){note("Échec : "+e.message)}}},bl?"Débloquer":"Bloquer"),
+  confirmBtn("Supprimer","del",async()=>{await delTeacher(id,d.cid);SUPSEL=null;reload();regList()})]}
+async function checkBlk(){
+ if(!FBON()||admin||!CID||!AUTH)return;
+ try{const b=await fb("GET","blocked/"+CID);if(b===true){ls.set("blk",1);lockBlocked()}else if(ls.get("blk")){ls.set("blk",0);boot()}}catch(e){}}
+function lockBlocked(){document.body.classList.add("locked");const g=$("#g");g.replaceChildren(cd("⛔ Accès suspendu","Votre accès a été suspendu ou supprimé par l’administrateur."))}
+
 /* ---------- DÉMARRAGE ---------- */
 renderF();renderC();renderD();
-(async()=>{await loadCfg();renderF();renderD();await boot()})();
+(async()=>{await loadCfg();renderF();renderC();renderE();renderV();renderR();renderL();renderD();await boot()})();
 </script></body></html>
