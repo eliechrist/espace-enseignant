@@ -276,7 +276,7 @@ function ensPdf(m,cur,gen){try{const d=new window.jspdf.jsPDF({unit:"mm",format:
  savePdf(d,"Rapport_ensemble_"+m+".pdf")}catch(e){note("Échec : "+((e&&e.message)||e))}}
 /* ---------- FIREBASE : SUIVI EN TEMPS RÉEL ET MESSAGES ---------- */
 const FB={key:"",db:"",admin:"admin@espace-enseignant.app"};
-async function loadCfg(){try{const t=await(await fetch("config.txt",{cache:"no-store"})).text(),k=t.match(/apiKey\s*[:=]\s*["']([^"']+)["']/),d=t.match(/databaseURL\s*[:=]\s*["']([^"']+)["']/);if(k)FB.key=k[1];if(d)FB.db=d[1]}catch(e){}const v=$("#ver");if(v)v.textContent="Version 3.0 · Serveur : "+(FBON()?"configuré":"non configuré")}
+async function loadCfg(){try{const t=await(await fetch("config.txt",{cache:"no-store"})).text(),k=t.match(/apiKey\s*[:=]\s*["']([^"']+)["']/),d=t.match(/databaseURL\s*[:=]\s*["']([^"']+)["']/);if(k)FB.key=k[1];if(d)FB.db=d[1]}catch(e){}const v=$("#ver");if(v)v.textContent="Version 3.1 · Serveur : "+(FBON()?"configuré":"non configuré")}
 const FBON=()=>!!(FB.key&&FB.db&&FB.admin);
 const canon=pw=>{const q=pw.replace(/[\s-]/g,"").toUpperCase();return q.slice(0,4)+"-"+q.slice(4,8)+"-"+q.slice(8)};
 let AUTH=ls.get("fbauth"),MSGS=[],syncT=0,SUPT=0,SUPSEL=null,SUPMT="";
@@ -318,10 +318,26 @@ function startTeacher(){
  if(admin||window._st)return;window._st=1;$('[data-t="p"]').classList.remove("hid");renderP();if(!FBON())return;
  $('[data-t="p"]').classList.remove("hid");renderP();const b=$('[data-t="m"]');b.classList.remove("hid");b.addEventListener("click",()=>{ls.set("seen",Date.now());b.textContent="✉ Messages"});renderM();
  (async()=>{try{if(!AUTH||AUTH.adm)await fbAuth("anon",{})}catch(e){}syncReport();pollInbox();setInterval(pollInbox,8000);setInterval(syncReport,60000)})()}
+let PURGED=0;
+const apCfg=()=>{const a=ls.get("autopurge");return{on:a?a.on!==false:true,h:a&&+a.h>0?+a.h:24}};
+async function purgeOld(data,force){
+ const ap=apCfg();if(!ap.on&&!force)return 0;
+ const lim=Date.now()-ap.h*3600000,del=new Set(),byC={};
+ Object.keys(data).forEach(id=>{const c=data[id]&&data[id].cid;if(c)(byC[c]=byC[c]||[]).push(id)});
+ Object.keys(byC).forEach(c=>byC[c].sort((a,b)=>(data[b].last||0)-(data[a].last||0)).slice(1).forEach(id=>del.add(id)));
+ Object.keys(data).forEach(id=>{const d=data[id]||{};if((d.last||0)<lim&&!(d.cid&&BLK&&BLK[d.cid]))del.add(id)});
+ let n=0;for(const id of del){try{await fb("DELETE","reports/"+id);delete data[id];n++}catch(e){}}return n}
 function supCard(){
  const box=h("div",{class:"card"},h("b",{},"Suivi des enseignants (temps réel)"));
  if(!FBON()){box.append(h("p",{class:"m"},"Non configuré : la base Firebase n’est pas encore reliée à l’application."));return box}
- const body=h("div"),st=h("p",{class:"m"},"Connexion…");box.append(st,body);
+ const body=h("div"),st=h("p",{class:"m"},"Connexion…"),ps=h("p",{class:"m"},"");
+ const ap0=apCfg(),onSel=h("select",{},h("option",{value:"1"},"Activé"),h("option",{value:"0"},"Désactivé")),hSel=h("select",{},...[[6,"6 heures"],[12,"12 heures"],[24,"24 heures"],[48,"48 heures"],[168,"7 jours"]].map(([v,l])=>h("option",{value:String(v)},l)));
+ onSel.value=ap0.on?"1":"0";hSel.value=String(ap0.h);
+ const cfg=h("div",{class:"warn"},h("b",{},"Nettoyage automatique de la liste"),h("div",{class:"g"},h("div",{},h("label",{},"Nettoyage"),onSel),h("div",{},h("label",{},"Supprimer les enseignants inactifs depuis"),hSel)),
+  h("div",{class:"m"},"Les doublons du même enseignant sont aussi supprimés. Un enseignant réapparaît dès qu’il rouvre l’application. Le nettoyage s’exécute tant que votre espace administrateur est ouvert."),
+  h("div",{class:"row"},h("button",{onclick:async()=>{try{await ensureAdm();const n=await purgeOld(data,true);PURGED+=n;ps.textContent=n+" entrée(s) supprimée(s).";last="";load()}catch(e){ps.textContent="Échec : "+e.message}}},"Nettoyer maintenant")),ps);
+ const sv2=()=>{ls.set("autopurge",{on:onSel.value==="1",h:+hSel.value});ps.textContent="Réglage enregistré.";load()};onSel.addEventListener("change",sv2);hSel.addEventListener("change",sv2);
+ box.append(cfg,st,body);
  let last="",data={};
  const ago=t=>{const s=(Date.now()-t)/1000;return s<90?"à l’instant":s<5400?Math.round(s/60)+" min":s<129600?Math.round(s/3600)+" h":Math.round(s/86400)+" j"};
  const send=async(ids,ta,info)=>{const txt=ta.value.trim();if(!txt){info.textContent="Écrivez un message.";return}
@@ -339,7 +355,7 @@ function supCard(){
   if(SUPSEL&&data[SUPSEL])detail(SUPSEL)};
  const load=async()=>{try{
   if(!AUTH||!AUTH.adm)await fbAuth("adm",{email:FB.admin,password:ls.get("admpw")||""});
-  data=await fb("GET","reports")||{};BLK=await fb("GET","blocked")||{};const j=JSON.stringify([data,BLK]);if(j!==last){last=j;draw()}
+  data=await fb("GET","reports")||{};BLK=await fb("GET","blocked")||{};const nP=await purgeOld(data);if(nP){PURGED+=nP;ps.textContent=PURGED+" ancienne(s) entrée(s) supprimée(s) automatiquement."}const j=JSON.stringify([data,BLK]);if(j!==last){last=j;draw()}
   st.textContent="Mis à jour à "+new Date().toLocaleTimeString("fr-FR")+" (toutes les 6 s)"}catch(e){st.textContent="Erreur : "+e.message}};
  load();clearInterval(SUPT);SUPT=setInterval(load,6000);return box}
 
